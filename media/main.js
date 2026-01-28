@@ -254,10 +254,23 @@
     });
 
     saveModal.addEventListener('click', () => {
-        const name = document.getElementById('entry-name').value;
-        const content = document.getElementById('entry-content').value;
+        const nameInput = document.getElementById('entry-name');
+        const contentInput = document.getElementById('entry-content');
+        const name = nameInput.value.trim();
+        const content = contentInput.value.trim();
 
-        if (name && content) {
+        console.log('Attempting to save:', {
+            name,
+            content,
+            activeTab: state.activeTab
+        });
+
+        if (!name || !content) {
+            alert('Please enter both a name and some content.');
+            return;
+        }
+
+        try {
             if (editingId) {
                 const entry = state.entries.find(e => e.id === editingId);
                 if (entry) {
@@ -277,11 +290,16 @@
                     pinned: false
                 };
                 state.entries.push(entry);
+                console.log('New entry added:', entry);
             }
             save();
             render();
             modal.classList.add('hidden');
             hideDropdowns();
+            console.log('Save successful');
+        } catch (err) {
+            console.error('Error during save:', err);
+            alert('Error saving entry: ' + err.message);
         }
     });
 

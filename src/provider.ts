@@ -126,18 +126,26 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
     }
 
     private _saveData(data: any) {
-        const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
-        if (!fs.existsSync(this._context.globalStorageUri.fsPath)) {
-            fs.mkdirSync(this._context.globalStorageUri.fsPath, { recursive: true });
+        try {
+            const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
+            if (!fs.existsSync(this._context.globalStorageUri.fsPath)) {
+                fs.mkdirSync(this._context.globalStorageUri.fsPath, { recursive: true });
+            }
+            fs.writeFileSync(storagePath, JSON.stringify(data, null, 2));
+        } catch (err: any) {
+            vscode.window.showErrorMessage(`Failed to save data: ${err.message}`);
         }
-        fs.writeFileSync(storagePath, JSON.stringify(data, null, 2));
     }
 
     private _loadData() {
-        const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
-        if (fs.existsSync(storagePath)) {
-            const data = fs.readFileSync(storagePath, 'utf8');
-            this._view?.webview.postMessage({ type: 'dataLoaded', value: JSON.parse(data) });
+        try {
+            const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
+            if (fs.existsSync(storagePath)) {
+                const data = fs.readFileSync(storagePath, 'utf8');
+                this._view?.webview.postMessage({ type: 'dataLoaded', value: JSON.parse(data) });
+            }
+        } catch (err: any) {
+            vscode.window.showErrorMessage(`Failed to load data: ${err.message}`);
         }
     }
 
