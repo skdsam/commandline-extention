@@ -66,6 +66,53 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         });
     }
 
+    public async resetGitConfig() {
+        const storagePath = this._context.globalStorageUri.fsPath;
+        const gitPath = path.join(storagePath, '.git');
+
+        if (!fs.existsSync(gitPath)) {
+            vscode.window.showInformationMessage('Git is not configured. Use "Sync with Git" to set it up.');
+            return;
+        }
+
+        const choice = await vscode.window.showQuickPick(
+            ['Change remote URL', 'Remove Git configuration completely'],
+            { placeHolder: 'What would you like to do?' }
+        );
+
+        if (!choice) {
+            return;
+        }
+
+        if (choice === 'Remove Git configuration completely') {
+            const confirm = await vscode.window.showWarningMessage(
+                'This will remove Git sync. Your data will remain but won\'t sync. Continue?',
+                'Yes, Remove', 'Cancel'
+            );
+            if (confirm === 'Yes, Remove') {
+                try {
+                    fs.rmSync(gitPath, { recursive: true, force: true });
+                    vscode.window.showInformationMessage('Git configuration removed. Click "Sync with Git" to set up again.');
+                } catch (err: any) {
+                    vscode.window.showErrorMessage(`Failed to remove Git: ${err.message}`);
+                }
+            }
+        } else if (choice === 'Change remote URL') {
+            const newUrl = await vscode.window.showInputBox({
+                prompt: 'Enter the new Git remote URL',
+                placeHolder: 'https://github.com/user/repo.git'
+            });
+            if (newUrl) {
+                try {
+                    await this._execGit(['remote', 'set-url', 'origin', newUrl]);
+                    vscode.window.showInformationMessage(`Remote URL updated to: ${newUrl}`);
+                } catch (err: any) {
+                    vscode.window.showErrorMessage(`Failed to update remote: ${err}`);
+                }
+            }
+        }
+    }
+
     public async syncWithGit() {
         const storagePath = this._context.globalStorageUri.fsPath;
 
@@ -81,9 +128,21 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                         prompt: 'Enter your Git remote URL (e.g., https://github.com/user/repo.git)'
                     });
                     if (remote) {
-                        await this._execGit(['init']);
+                        // Initialize git with main as default branch
+                        await this._execGit(['init', '-b', 'main']);
                         await this._execGit(['remote', 'add', 'origin', remote]);
-                        vscode.window.showInformationMessage('Git initialized and remote added.');
+
+                        // Create data.json if it doesn't exist
+                        const dataPath = path.join(storagePath, 'data.json');
+                        if (!fs.existsSync(dataPath)) {
+                            fs.writeFileSync(dataPath, '[]');
+                        }
+
+                        // Make initial commit
+                        await this._execGit(['add', 'data.json']);
+                        await this._execGit(['commit', '-m', '"Initial commit"']);
+
+                        vscode.window.showInformationMessage('Git initialized with initial commit.');
                     } else {
                         return;
                     }
@@ -108,11 +167,17 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                         // Likely no changes to commit
                     }
 
+                    // Try to pull first, but don't fail if remote branch doesn't exist yet
                     progress.report({ message: "Pulling latest..." });
-                    await this._execGit(['pull', 'origin', 'main', '--rebase']);
+                    try {
+                        await this._execGit(['pull', 'origin', 'main', '--rebase']);
+                    } catch (e) {
+                        // Remote branch might not exist yet (empty repo), that's ok
+                    }
 
                     progress.report({ message: "Pushing..." });
-                    await this._execGit(['push', 'origin', 'main']);
+                    // Use -u to set upstream on first push
+                    await this._execGit(['push', '-u', 'origin', 'main']);
 
                     vscode.window.showInformationMessage('Sync complete!');
                     this._loadData(); // Reload in case pull changed data.json
@@ -153,7 +218,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
             await this._execGit(['add', 'data.json']);
 
             try {
-                await this._execGit(['commit', '-m', `Auto-sync: ${new Date().toISOString()}`]);
+                await this._execGit(['commit', '-m', `"Auto-sync: ${new Date().toISOString()}"`]);
             } catch (e) {
                 // No changes to commit, that's fine
                 return;
@@ -166,7 +231,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 // Pull failed, might be first push or offline
             }
 
-            await this._execGit(['push', 'origin', 'main']);
+            await this._execGit(['push', '-u', 'origin', 'main']);
         } catch (err: any) {
             // Silent fail for auto-sync - don't spam user with errors
             console.log(`Auto-sync failed: ${err}`);

@@ -23,6 +23,12 @@ export function activate(context: vscode.ExtensionContext) {
             provider.syncWithGit();
         })
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('command-tracker.resetGit', () => {
+            provider.resetGitConfig();
+        })
+    );
 }
 
 export function deactivate() { }
