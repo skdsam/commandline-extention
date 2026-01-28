@@ -23,8 +23,8 @@ A VS Code extension for managing reusable commands and prompts with a premium na
 ### From Source
 
 ```bash
-git clone https://github.com/skdsam/command-tracker.git
-cd command-extention
+git clone https://github.com/skdsam/commandline-extention.git
+cd commandline-extention
 npm install
 npm run compile
 ```
