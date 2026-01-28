@@ -105,11 +105,17 @@ input[type="text"] {
     background: var(--vscode-list-hoverBackground);
 }
 
-.entry-color-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+.entry-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 10px;
+}
+
+.entry-icon .codicon {
+    font-size: 16px;
 }
 
 .entry-info {
@@ -150,7 +156,7 @@ input[type="text"] {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -165,27 +171,130 @@ input[type="text"] {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
     padding: 16px;
-    width: 250px;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    border-radius: 4px;
+}
+
+.modal-body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 textarea {
     background: var(--input-bg);
     color: var(--input-fg);
     border: 1px solid var(--border-color);
-    padding: 4px 8px;
+    padding: 6px 8px;
     border-radius: 2px;
     resize: none;
-    height: 80px;
+    height: 120px;
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 12px;
+}
+
+.picker-row {
+    display: flex;
+    gap: 8px;
+}
+
+.picker-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.picker-btn:hover {
+    background: var(--vscode-list-hoverBackground);
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Dropdown Pickers */
+.picker-dropdown {
+    position: fixed;
+    background: var(--vscode-quickInput-background, var(--bg-color));
+    border: 1px solid var(--vscode-quickInput-border, var(--border-color));
+    z-index: 200;
+    width: 240px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+}
+
+.picker-dropdown.hidden {
+    display: none;
+}
+
+.picker-dropdown input {
+    margin-bottom: 4px;
+}
+
+.picker-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.picker-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.picker-item:hover {
+    background: var(--vscode-list-hoverBackground);
+    color: var(--vscode-list-hoverForeground);
+}
+
+.picker-item span {
+    font-size: 14px;
 }
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+}
+
+.modal-actions button {
+    padding: 4px 12px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+#save-modal {
+    background: var(--button-bg);
+    color: var(--button-fg);
+    border: none;
+}
+
+#cancel-modal {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
 }
 
 /* Footer */

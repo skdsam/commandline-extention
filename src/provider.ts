@@ -144,6 +144,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
     private _getHtmlForWebview(webview: vscode.Webview) {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
         const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'sidebar.css'));
+        const codiconsUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
 
         return `<!DOCTYPE html>
             <html lang="en">
@@ -151,6 +152,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="${styleUri}" rel="stylesheet">
+                <link href="${codiconsUri}" rel="stylesheet">
                 <title>Command Tracker</title>
             </head>
             <body>
@@ -177,17 +179,38 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 <div id="modal" class="modal hidden">
                     <div class="modal-content">
                         <h3 id="modal-title">Add Entry</h3>
-                        <input type="text" id="entry-name" placeholder="Name" />
-                        <textarea id="entry-content" placeholder="Content"></textarea>
-                        <div class="modal-options">
-                            <input type="color" id="entry-color" value="#007acc" />
-                            <input type="text" id="entry-icon" placeholder="Icon (Codicon)" />
+                        <div class="modal-body">
+                            <input type="text" id="entry-name" placeholder="Name" />
+                            <textarea id="entry-content" placeholder="Content"></textarea>
+                            
+                            <div class="picker-row">
+                                <button id="icon-picker-trigger" class="picker-btn">
+                                    <span id="current-icon-display" class="codicon codicon-symbol-folder"></span>
+                                    <span id="current-icon-name">Folder</span>
+                                </button>
+                                <button id="color-picker-trigger" class="picker-btn">
+                                    <div id="current-color-display" class="color-dot" style="background-color: var(--vscode-button-background);"></div>
+                                    <span id="current-color-name">Default</span>
+                                </button>
+                            </div>
                         </div>
+
                         <div class="modal-actions">
                             <button id="cancel-modal">Cancel</button>
                             <button id="save-modal">Save</button>
                         </div>
                     </div>
+                </div>
+
+                <!-- Dropdown Pickers -->
+                <div id="icon-picker-dropdown" class="picker-dropdown hidden">
+                    <input type="text" id="icon-search" placeholder="Search icons..." />
+                    <div id="icon-list" class="picker-list"></div>
+                </div>
+
+                <div id="color-picker-dropdown" class="picker-dropdown hidden">
+                    <input type="text" id="color-search" placeholder="Search colors..." />
+                    <div id="color-list" class="picker-list"></div>
                 </div>
 
                 <script src="${scriptUri}"></script>
