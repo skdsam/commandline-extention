@@ -141,7 +141,7 @@
 
     const COLORS = [{
             label: 'Default',
-            color: 'var(--vscode-button-background)'
+            color: 'var(--text-color)'
         },
         {
             label: 'Blue',
@@ -443,18 +443,26 @@
         filtered.forEach(entry => {
             const el = document.createElement('div');
             el.className = 'entry-item';
+
+            const iconColor = entry.color || 'var(--text-color)';
+            // Default icon: terminal for prompts, symbol-folder for commands
+            const defaultIcon = entry.type === 'prompts' ? 'terminal' : 'symbol-folder';
+            const iconName = entry.icon || defaultIcon;
+            const pinIndicator = entry.pinned ? '<span class="pin-indicator" style="color: #e53935; margin-left: 4px;">📌</span>' : '';
+
             el.innerHTML = `
                 <div class="entry-icon">
-                    <span class="codicon codicon-${entry.icon || 'symbol-folder'}" style="color: ${entry.color}"></span>
+                    <span class="codicon codicon-${iconName}" style="color: ${iconColor}"></span>
                 </div>
+                ${pinIndicator}
                 <div class="entry-info">
-                    <div class="entry-name">${entry.name}</div>
+                    <div class="entry-name" title="${entry.name}">${entry.name}</div>
                 </div>
                 <div class="entry-actions">
-                    <button class="action-btn copy-btn" title="Copy">📋</button>
-                    <button class="action-btn edit-btn" title="Edit">✏️</button>
-                    <button class="action-btn pin-btn" title="Pin">${entry.pinned ? '📍' : '📌'}</button>
-                    <button class="action-btn delete-btn" title="Delete">🗑️</button>
+                    <button class="action-btn copy-btn" title="Copy Content"><span class="codicon codicon-copy"></span></button>
+                    <button class="action-btn edit-btn" title="Edit Entry"><span class="codicon codicon-edit"></span></button>
+                    <button class="action-btn pin-btn" title="${entry.pinned ? 'Unpin' : 'Pin'}"><span class="codicon codicon-${entry.pinned ? 'pin' : 'pinned'}"></span></button>
+                    <button class="action-btn delete-btn" title="Delete Entry"><span class="codicon codicon-trash"></span></button>
                 </div>
             `;
 

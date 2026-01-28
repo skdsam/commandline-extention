@@ -17,7 +17,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         _token: vscode.CancellationToken
     ) {
         this._view = webviewView;
-        vscode.window.showInformationMessage('Command Tracker Sidebar Loaded [v0.1.1]');
+        vscode.window.showInformationMessage('Command Tracker Sidebar Loaded');
 
         webviewView.webview.options = {
             enableScripts: true,
@@ -126,15 +126,50 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    private _saveData(data: any) {
+    private async _saveData(data: any) {
         try {
             const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
             if (!fs.existsSync(this._context.globalStorageUri.fsPath)) {
                 fs.mkdirSync(this._context.globalStorageUri.fsPath, { recursive: true });
             }
             fs.writeFileSync(storagePath, JSON.stringify(data, null, 2));
+
+            // Auto-sync with Git after each save
+            await this._autoSync();
         } catch (err: any) {
             vscode.window.showErrorMessage(`Failed to save data: ${err.message}`);
+        }
+    }
+
+    private async _autoSync() {
+        const storagePath = this._context.globalStorageUri.fsPath;
+
+        // Only sync if git is initialized
+        if (!fs.existsSync(path.join(storagePath, '.git'))) {
+            return;
+        }
+
+        try {
+            await this._execGit(['add', 'data.json']);
+
+            try {
+                await this._execGit(['commit', '-m', `Auto-sync: ${new Date().toISOString()}`]);
+            } catch (e) {
+                // No changes to commit, that's fine
+                return;
+            }
+
+            // Pull and push silently in background
+            try {
+                await this._execGit(['pull', 'origin', 'main', '--rebase']);
+            } catch (e) {
+                // Pull failed, might be first push or offline
+            }
+
+            await this._execGit(['push', 'origin', 'main']);
+        } catch (err: any) {
+            // Silent fail for auto-sync - don't spam user with errors
+            console.log(`Auto-sync failed: ${err}`);
         }
     }
 
