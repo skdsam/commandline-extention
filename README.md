@@ -23,7 +23,7 @@ A VS Code extension for managing reusable commands and prompts with a premium na
 ### From Source
 
 ```bash
-git clone https://github.com/skdsam/commandline-extention.git
+git clone https://github.com/skdsam/command-tracker.git
 cd command-extention
 npm install
 npm run compile
@@ -63,6 +63,19 @@ Click the **Command Tracker** icon in the Activity Bar (left panel) to open the 
 3. After setup, all changes sync automatically in the background
 
 **Manual Sync:** You can still click **Sync with Git** to force a manual sync if needed.
+
+### Reset Git Configuration
+
+To change or remove your Git sync setup, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
+
+**Command Tracker: Reset Git Configuration**
+
+This gives you two options:
+
+| Option | Description |
+|--------|-------------|
+| **Change remote URL** | Update the remote repository URL (e.g., switch to a different GitHub repo) |
+| **Remove Git configuration completely** | Removes Git sync entirely. Your data files remain untouched, but automatic syncing stops. You can set up Git again anytime using the Sync button. |
 
 ## Icons
 
