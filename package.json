@@ -4,6 +4,7 @@
   "publisher": "skdsam",
   "description": "Manage reusable commands and prompts with a premium native UI.",
   "version": "0.1.6",
+  "icon": "media/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/skdsam/commandline-extention.git"
@@ -22,7 +23,7 @@
         {
           "id": "command-tracker-sidebar",
           "title": "Command Tracker",
-          "icon": "media/icon.svg"
+          "icon": "media/icon.png"
         }
       ]
     },
@@ -31,7 +32,8 @@
         {
           "type": "webview",
           "id": "command-tracker-view",
-          "name": "Commands & Prompts"
+          "name": "Commands & Prompts",
+          "icon": "media/icon.png"
         }
       ]
     },
