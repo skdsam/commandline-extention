@@ -4,6 +4,10 @@
   "publisher": "skdsam",
   "description": "Manage reusable commands and prompts with a premium native UI.",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skdsam/commandline-extention.git"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
