@@ -256,12 +256,15 @@
     saveModal.addEventListener('click', () => {
         const nameInput = document.getElementById('entry-name');
         const contentInput = document.getElementById('entry-content');
+        const notesInput = document.getElementById('entry-notes');
         const name = nameInput.value.trim();
         const content = contentInput.value.trim();
+        const notes = notesInput.value.trim();
 
         console.log('Attempting to save:', {
             name,
             content,
+            notes,
             activeTab: state.activeTab
         });
 
@@ -276,6 +279,7 @@
                 if (entry) {
                     entry.name = name;
                     entry.content = content;
+                    entry.notes = notes;
                     entry.color = state.selectedColor.color;
                     entry.icon = state.selectedIcon.icon;
                 }
@@ -285,6 +289,7 @@
                     type: state.activeTab,
                     name,
                     content,
+                    notes,
                     color: state.selectedColor.color,
                     icon: state.selectedIcon.icon,
                     pinned: false
@@ -310,6 +315,7 @@
             document.getElementById('modal-title').textContent = 'Edit Entry';
             document.getElementById('entry-name').value = entry.name;
             document.getElementById('entry-content').value = entry.content;
+            document.getElementById('entry-notes').value = entry.notes || '';
 
             const savedIcon = ICONS.find(i => i.icon === entry.icon) || ICONS[0];
             const savedColor = COLORS.find(c => c.color === entry.color) || COLORS[0];
@@ -407,6 +413,7 @@
     function clearModal() {
         document.getElementById('entry-name').value = '';
         document.getElementById('entry-content').value = '';
+        document.getElementById('entry-notes').value = '';
         updateIconSelection(ICONS[0]);
         updateColorSelection(COLORS[0]);
     }
@@ -437,7 +444,12 @@
 
         const filtered = state.entries
             .filter(e => e.type === state.activeTab)
-            .filter(e => e.name.toLowerCase().includes(state.searchQuery) || e.content.toLowerCase().includes(state.searchQuery))
+            .filter(e => {
+                const query = state.searchQuery;
+                return e.name.toLowerCase().includes(query) ||
+                    e.content.toLowerCase().includes(query) ||
+                    (e.notes && e.notes.toLowerCase().includes(query));
+            })
             .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
         filtered.forEach(entry => {
@@ -457,6 +469,7 @@
                 ${pinIndicator}
                 <div class="entry-info">
                     <div class="entry-name" title="${entry.name}">${entry.name}</div>
+                    ${entry.notes ? `<div class="entry-notes" title="${entry.notes}">${entry.notes}</div>` : ''}
                 </div>
                 <div class="entry-actions">
                     <button class="action-btn copy-btn" title="Copy Content"><span class="codicon codicon-copy"></span></button>
