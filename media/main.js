@@ -354,13 +354,13 @@
             } else {
                 const entry = {
                     id: Date.now().toString(),
-                    type: state.activeTab,
+                    type: state.activeTab === 'pinned' ? 'commands' : state.activeTab,
                     name,
                     content,
                     notes,
                     color: state.selectedColor.color,
                     icon: state.selectedIcon.icon,
-                    pinned: false
+                    pinned: state.activeTab === 'pinned'
                 };
                 state.entries.push(entry);
                 console.log('New entry added:', entry);
@@ -593,7 +593,7 @@
         listContainer.innerHTML = '';
 
         const filtered = state.entries
-            .filter(e => e.type === state.activeTab)
+            .filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab)
             .filter(e => {
                 const query = state.searchQuery;
                 return e.name.toLowerCase().includes(query) ||

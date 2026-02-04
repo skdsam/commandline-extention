@@ -319,6 +319,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="commands">Commands</button>
                         <button class="tab-btn" data-tab="prompts">Prompts</button>
+                        <button class="tab-btn" data-tab="pinned">Pinned</button>
                     </div>
                     
                     <div class="search-container">
