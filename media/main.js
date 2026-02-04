@@ -288,7 +288,7 @@
     // Collapse/Expand All
     collapseAllBtn.addEventListener('click', () => {
         // Set all current groups to collapsed
-        const filtered = state.entries.filter(e => e.type === state.activeTab);
+        const filtered = state.entries.filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab);
         const iconNames = [...new Set(filtered.map(e => e.icon || (e.type === 'prompts' ? 'terminal' : 'symbol-folder')))];
         iconNames.forEach(iconName => {
             state.collapsedGroups[iconName] = true;
@@ -298,7 +298,7 @@
 
     expandAllBtn.addEventListener('click', () => {
         // Set all current groups to expanded
-        const filtered = state.entries.filter(e => e.type === state.activeTab);
+        const filtered = state.entries.filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab);
         const iconNames = [...new Set(filtered.map(e => e.icon || (e.type === 'prompts' ? 'terminal' : 'symbol-folder')))];
         iconNames.forEach(iconName => {
             state.collapsedGroups[iconName] = false;

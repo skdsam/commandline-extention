@@ -20,7 +20,7 @@ A VS Code extension for managing reusable commands and prompts with a premium na
 1. Download the `.vsix` file
 2. In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
 3. Run **Extensions: Install from VSIX...**
-4. Select the downloaded `.vsix` file (e.g., `commandline-extention-1.2.3.vsix`)
+4. Select the downloaded `.vsix` file (e.g., `commandline-extention-1.2.4.vsix`)
 
 ### From Source
 
@@ -106,6 +106,10 @@ Over 40 codicons are available for customization, including new design-themed ic
 - **Symbol Ruler**
 - **Browser**
 - **Symbol Color**
+
+## What's New in Version 1.2.4
+
+✅ **Pinned Tab Fix** — Fixed "Collapse All" and "Expand All" buttons so they now correctly affect items in the Pinned tab.
 
 ## What's New in Version 1.2.3
 
