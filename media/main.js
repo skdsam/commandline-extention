@@ -156,6 +156,30 @@
         {
             label: 'Sparkle',
             icon: 'sparkle'
+        },
+        {
+            label: 'Design',
+            icon: 'paintcan'
+        },
+        {
+            label: 'Layout',
+            icon: 'layout'
+        },
+        {
+            label: 'Pencil',
+            icon: 'pencil'
+        },
+        {
+            label: 'Ruler',
+            icon: 'symbol-ruler'
+        },
+        {
+            label: 'Browser',
+            icon: 'browser'
+        },
+        {
+            label: 'Symbol Color',
+            icon: 'symbol-color'
         }
     ];
 
