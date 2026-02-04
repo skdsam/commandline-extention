@@ -323,7 +323,18 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                     
                     <div class="search-container">
                         <input type="text" id="search" placeholder="Search..." />
+                        <button id="collapse-all-btn" class="icon-action-btn" title="Collapse All"><span class="codicon codicon-collapse-all"></span></button>
+                        <button id="expand-all-btn" class="icon-action-btn" title="Expand All"><span class="codicon codicon-expand-all"></span></button>
                         <button id="add-btn">+</button>
+                    </div>
+
+                    <!-- Missing Repos Container -->
+                    <div id="missing-repos-container" class="missing-repos-container hidden">
+                        <div id="missing-repos-header" class="missing-repos-header">
+                            <span class="codicon codicon-chevron-down"></span>
+                            <span>Missing Repositories</span>
+                        </div>
+                        <div id="missing-repos-list" class="missing-repos-list"></div>
                     </div>
 
                     <div id="list-container" class="list-container">
@@ -332,6 +343,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
 
                     <div class="sync-footer">
                         <button id="sync-btn">Sync with Git</button>
+                        <button id="pull-btn" class="hidden">Pull Updates</button>
                     </div>
                 </div>
 

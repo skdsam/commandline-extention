@@ -224,6 +224,8 @@
     const listContainer = document.getElementById('list-container');
     const searchInput = document.getElementById('search');
     const addBtn = document.getElementById('add-btn');
+    const collapseAllBtn = document.getElementById('collapse-all-btn');
+    const expandAllBtn = document.getElementById('expand-all-btn');
     const syncBtn = document.getElementById('sync-btn');
     const pullBtn = document.getElementById('pull-btn');
     const missingReposContainer = document.getElementById('missing-repos-container');
@@ -256,6 +258,27 @@
     // Search
     searchInput.addEventListener('input', (e) => {
         state.searchQuery = e.target.value.toLowerCase();
+        render();
+    });
+
+    // Collapse/Expand All
+    collapseAllBtn.addEventListener('click', () => {
+        // Set all current groups to collapsed
+        const filtered = state.entries.filter(e => e.type === state.activeTab);
+        const iconNames = [...new Set(filtered.map(e => e.icon || (e.type === 'prompts' ? 'terminal' : 'symbol-folder')))];
+        iconNames.forEach(iconName => {
+            state.collapsedGroups[iconName] = true;
+        });
+        render();
+    });
+
+    expandAllBtn.addEventListener('click', () => {
+        // Set all current groups to expanded
+        const filtered = state.entries.filter(e => e.type === state.activeTab);
+        const iconNames = [...new Set(filtered.map(e => e.icon || (e.type === 'prompts' ? 'terminal' : 'symbol-folder')))];
+        iconNames.forEach(iconName => {
+            state.collapsedGroups[iconName] = false;
+        });
         render();
     });
 
@@ -573,7 +596,7 @@
                 label: iconName,
                 icon: iconName
             };
-            const isCollapsed = state.collapsedGroups[iconName] === true;
+            const isCollapsed = state.searchQuery ? false : (state.collapsedGroups[iconName] !== false);
 
             // Create group header
             const groupHeader = document.createElement('div');

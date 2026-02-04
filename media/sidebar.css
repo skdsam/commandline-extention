@@ -42,6 +42,11 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
 #app {
     display: flex;
     flex-direction: column;
@@ -136,6 +141,29 @@ input[type="text"]:focus {
 
 #add-btn:hover {
     background: var(--button-hover);
+}
+
+.icon-action-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 4px 6px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.1s ease, background 0.1s ease;
+}
+
+.icon-action-btn:hover {
+    opacity: 1;
+    background: var(--list-hover-bg);
+}
+
+.icon-action-btn .codicon {
+    font-size: 14px;
 }
 
 /* List */
@@ -466,10 +494,13 @@ textarea:focus {
     padding: 8px;
     border-top: 1px solid var(--border-color);
     background: var(--bg-color);
+    display: flex;
+    gap: 6px;
 }
 
-#sync-btn {
-    width: 100%;
+#sync-btn,
+#pull-btn {
+    flex: 1;
     background: transparent;
     border: 1px solid var(--border-color);
     color: var(--text-color);
@@ -481,9 +512,103 @@ textarea:focus {
     opacity: 0.8;
 }
 
-#sync-btn:hover {
+#sync-btn:hover,
+#pull-btn:hover {
     background: var(--list-hover-bg);
     opacity: 1;
+}
+
+#pull-btn {
+    background: var(--button-bg);
+    color: var(--button-fg);
+    opacity: 1;
+}
+
+#pull-btn:hover {
+    background: var(--button-hover);
+}
+
+/* Missing Repositories Section */
+.missing-repos-container {
+    border-bottom: 1px solid var(--border-color);
+    background: var(--vscode-sideBarSectionHeader-background, rgba(255, 255, 255, 0.02));
+}
+
+.missing-repos-container.hidden {
+    display: none;
+}
+
+.missing-repos-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+    transition: background 0.1s ease, opacity 0.1s ease;
+}
+
+.missing-repos-header:hover {
+    background: var(--list-hover-bg);
+    opacity: 1;
+}
+
+.missing-repos-list {
+    padding: 4px 0;
+}
+
+.missing-repos-list.hidden {
+    display: none;
+}
+
+.missing-repo-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px 6px 32px;
+    gap: 8px;
+    cursor: default;
+    transition: background 0.05s ease;
+}
+
+.missing-repo-item:hover {
+    background: var(--list-hover-bg);
+}
+
+.missing-repo-name {
+    flex: 1;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.download-icon-btn {
+    background: var(--button-bg);
+    border: none;
+    color: var(--button-fg);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: opacity 0.1s ease, background 0.1s ease;
+}
+
+.download-icon-btn:hover {
+    opacity: 1;
+    background: var(--button-hover);
+}
+
+/* Pin Indicator */
+.pin-indicator {
+    font-size: 12px;
+    margin-right: 4px;
 }
 
 /* Scrollbar Styling */
