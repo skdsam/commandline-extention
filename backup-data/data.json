@@ -1,0 +1,632 @@
+[
+  {
+    "id": "1769596551842",
+    "type": "prompts",
+    "name": "Typography",
+    "content": "Typography: Optimized font sizes (11px base) and weights (450-600) for a precise, \"engineered\" look.\nLetter Spacing: Added subtle letter-spacing adjustments (0.01em and -0.01em) for improved readability and style.\nDensity: Increased information density while maintaining breathability.\nMicro-Animations: Added smooth transitions for tab switching, button hovers, and list interactions.",
+    "notes": "Native UI design guidelines and typographic specifications.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "paintcan",
+    "pinned": true
+  },
+  {
+    "id": "1738153300001",
+    "type": "commands",
+    "name": "Cargo: New Project",
+    "content": "cargo new <name>",
+    "notes": "Creates a new Rust project in a folder with the given name.",
+    "color": "var(--vscode-charts-orange)",
+    "icon": "new-folder",
+    "pinned": false
+  },
+  {
+    "id": "1738153300002",
+    "type": "commands",
+    "name": "Cargo: Build",
+    "content": "cargo build",
+    "notes": "Compiles the current project and its dependencies.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "tools",
+    "pinned": false
+  },
+  {
+    "id": "1738153300003",
+    "type": "commands",
+    "name": "Cargo: Run",
+    "content": "cargo run",
+    "notes": "Compiles and executes the current project binary.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "play-circle",
+    "pinned": false
+  },
+  {
+    "id": "1738153300004",
+    "type": "commands",
+    "name": "Cargo: Check",
+    "content": "cargo check",
+    "notes": "Quickly check code for errors without building the full binary.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "check-all",
+    "pinned": false
+  },
+  {
+    "id": "1738153300005",
+    "type": "commands",
+    "name": "Cargo: Test",
+    "content": "cargo test",
+    "notes": "Runs all unit and integration tests defined in the project.",
+    "color": "var(--vscode-charts-yellow)",
+    "icon": "beaker",
+    "pinned": false
+  },
+  {
+    "id": "1738153300006",
+    "type": "commands",
+    "name": "NPM: Compile",
+    "content": "npm run compile",
+    "notes": "Compiles the extension code using the defined build script.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "gear",
+    "pinned": false
+  },
+  {
+    "id": "1738153300007",
+    "type": "commands",
+    "name": "VSCE: Package",
+    "content": "npx vsce package",
+    "notes": "Packages the extension into a .vsix file for installation.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "package",
+    "pinned": false
+  },
+  {
+    "id": "1738153300008",
+    "type": "commands",
+    "name": "Git: Init",
+    "content": "git init",
+    "notes": "Initializes a new local Git repository in the current folder.",
+    "color": "var(--vscode-charts-red)",
+    "icon": "repo",
+    "pinned": false
+  },
+  {
+    "id": "1738153300011",
+    "type": "commands",
+    "name": "Git: Clone",
+    "content": "git clone <url>",
+    "notes": "Clones a remote repository to your local machine.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "cloud-download",
+    "pinned": false
+  },
+  {
+    "id": "1738153300012",
+    "type": "commands",
+    "name": "Git: Status",
+    "content": "git status",
+    "notes": "Displays the state of the working directory and staging area.",
+    "color": "var(--vscode-charts-yellow)",
+    "icon": "info",
+    "pinned": true
+  },
+  {
+    "id": "1738153300013",
+    "type": "commands",
+    "name": "Git: Commit",
+    "content": "git commit -m \"<message>\"",
+    "notes": "Records changes to the repository with a descriptive message.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "check",
+    "pinned": false
+  },
+  {
+    "id": "1738153300014",
+    "type": "commands",
+    "name": "Git: Fetch & Pull",
+    "content": "git pull origin main",
+    "notes": "Fetches and integrates changes from the remote main branch.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "repo-pull",
+    "pinned": false
+  },
+  {
+    "id": "1738153300009",
+    "type": "commands",
+    "name": "Git: Push",
+    "content": "git push -u origin main",
+    "notes": "Uploads local commits to the remote main branch.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "cloud-upload",
+    "pinned": false
+  },
+  {
+    "id": "1738153300015",
+    "type": "commands",
+    "name": "Docker: Build",
+    "content": "docker build -t <tag> .",
+    "notes": "Builds an image from a Dockerfile in the current directory.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "tools",
+    "pinned": false
+  },
+  {
+    "id": "1738153300016",
+    "type": "commands",
+    "name": "Docker: Run",
+    "content": "docker run -it <image>",
+    "notes": "Starts a container from an image in interactive mode.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "play",
+    "pinned": false
+  },
+  {
+    "id": "1738153300017",
+    "type": "commands",
+    "name": "Docker: List Images",
+    "content": "docker images",
+    "notes": "Lists all Docker images stored locally.",
+    "color": "var(--vscode-terminal-ansiCyan)",
+    "icon": "layers",
+    "pinned": false
+  },
+  {
+    "id": "1738153300018",
+    "type": "commands",
+    "name": "Docker: List Containers",
+    "content": "docker ps -a",
+    "notes": "Lists all containers, including stopped ones.",
+    "color": "var(--vscode-terminal-ansiMagenta)",
+    "icon": "list-unordered",
+    "pinned": false
+  },
+  {
+    "id": "1738153300010",
+    "type": "commands",
+    "name": "CMake: Build",
+    "content": "cmake --build build",
+    "notes": "Builds a C++ project using CMake generated build files.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "tools",
+    "pinned": false
+  },
+  {
+    "id": "1738153300019",
+    "type": "commands",
+    "name": "Rust: Update Toolchain",
+    "content": "rustup update",
+    "notes": "Updates the Rust toolchain to the latest version.",
+    "color": "var(--vscode-charts-orange)",
+    "icon": "refresh",
+    "pinned": false
+  },
+  {
+    "id": "1738153300020",
+    "type": "commands",
+    "name": "NPM: Install",
+    "content": "npm install",
+    "notes": "Installs dependencies specified in package.json.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "package",
+    "pinned": false
+  },
+  {
+    "id": "1738153300021",
+    "type": "commands",
+    "name": "NPM: Run Dev",
+    "content": "npm run dev",
+    "notes": "Starts the development server for the project.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "rocket",
+    "pinned": true
+  },
+  {
+    "id": "1738153300022",
+    "type": "commands",
+    "name": "Git: Branch List",
+    "content": "git branch",
+    "notes": "Lists all local branches in the current repository.",
+    "color": "var(--vscode-terminal-ansiCyan)",
+    "icon": "git-branch",
+    "pinned": false
+  },
+  {
+    "id": "1738153300023",
+    "type": "commands",
+    "name": "Git: Checkout",
+    "content": "git checkout -b <branch>",
+    "notes": "Creates and switches to a new branch.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "git-merge",
+    "pinned": false
+  },
+  {
+    "id": "1738153300024",
+    "type": "commands",
+    "name": "Docker: Prune System",
+    "content": "docker system prune -f",
+    "notes": "Removes unused data to free up disk space.",
+    "color": "var(--vscode-charts-red)",
+    "icon": "trash",
+    "pinned": false
+  },
+  {
+    "id": "1738153300025",
+    "type": "commands",
+    "name": "VS Code: Build Extension",
+    "content": "npm run build",
+    "notes": "Compiles webview and source code for production.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "gear",
+    "pinned": false
+  },
+  {
+    "id": "1738153300026",
+    "type": "prompts",
+    "name": "Native UI Guidelines",
+    "content": "1. Think native desktop software, not SaaS\n2. Typography as a core design system\n3. Controlled, limited palette\n4. Solid, grounded UI elements\n5. Avoid web dashboard aesthetics",
+    "notes": "Design principles for achieving a premium native application look.",
+    "color": "var(--text-color)",
+    "icon": "law",
+    "pinned": true
+  },
+  {
+    "id": "1738153301001",
+    "type": "prompts",
+    "name": "PR Template: Standard",
+    "content": "## Description\n[Provide a brief description of the changes]\n\n## Related Issues\nFixes #[Issue Number]\n\n## Changes Made\n- [Refined logic for...]\n- [Added new component...]\n\n## Testing Performed\n- [x] Manual verification of UI\n- [x] Ran automated tests",
+    "notes": "A standard template for Pull Requests.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "git-pull-request",
+    "pinned": false
+  },
+  {
+    "id": "1738153301002",
+    "type": "prompts",
+    "name": "Code Review Checklist",
+    "content": "- [ ] Does the code follow project naming conventions?\n- [ ] Are there any obvious logic errors or edge cases missed?\n- [ ] Is the code well-commented where necessary?\n- [ ] Are there potential performance bottlenecks?\n- [ ] Does the UI match the design specification exactly?",
+    "notes": "General checklist for conducting code reviews.",
+    "color": "var(--vscode-charts-yellow)",
+    "icon": "check-all",
+    "pinned": false
+  },
+  {
+    "id": "1738153301003",
+    "type": "prompts",
+    "name": "Bug Report Template",
+    "content": "## Steps to Reproduce\n1. [Step 1]\n2. [Step 2]\n\n## Expected Behavior\n[What should have happened]\n\n## Actual Behavior\n[What actually happened]\n\n## Environment\n- OS: [e.g. Windows 11]\n- Version: [e.g. 1.0.2]",
+    "notes": "Structured format for reporting bugs.",
+    "color": "var(--vscode-charts-red)",
+    "icon": "bug",
+    "pinned": false
+  },
+  {
+    "id": "1738153301004",
+    "type": "prompts",
+    "name": "Conventional Commits Guide",
+    "content": "Format: <type>(<scope>): <description>\n\nTypes:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation changes\n- style: Changes that do not affect the meaning of the code\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests",
+    "notes": "Guideline for writing standardized Git commit messages.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "git-commit",
+    "pinned": false
+  },
+  {
+    "id": "1738153301005",
+    "type": "prompts",
+    "name": "System Architecture Overview",
+    "content": "## Components\n- Provider: Handles VS Code API interaction and data persistence.\n- Webview (Media): Manages the UI, state, and user interactions.\n- Data Storage: JSON-based local/remote sync via Git.",
+    "notes": "High-level summary of the Command & Prompt Tracker architecture.",
+    "color": "var(--vscode-terminal-ansiCyan)",
+    "icon": "symbol-class",
+    "pinned": false
+  },
+  {
+    "id": "1770115645602",
+    "type": "commands",
+    "name": "Terminal: Scratch folder",
+    "content": "New-Item -ItemType SymbolicLink -Path \"C:\\Users\\skdso\\.gemini\\antigravity\\scratch\" -Target \"D:\\scratch\"",
+    "notes": "Change your location of the scratch folder",
+    "color": "var(--vscode-charts-orange)",
+    "icon": "terminal",
+    "pinned": false
+  },
+  {
+    "id": "1738153301006",
+    "type": "prompts",
+    "name": "Design: Glassmorphism",
+    "content": "Keywords: Frosted glass, transparent layers, blurred background, depth, vibrant backdrop\n\nTechnical: backdrop-filter: blur(8px), rgba backgrounds, layered cards\n\nUse when: Modern apps, dashboards, overlays, modals\n\nAvoid: Low-contrast backgrounds, accessibility issues",
+    "notes": "Modern glassmorphism design style with frosted glass effects and transparent layers.",
+    "color": "var(--vscode-terminal-ansiCyan)",
+    "icon": "paintcan",
+    "pinned": false
+  },
+  {
+    "id": "1738153301007",
+    "type": "prompts",
+    "name": "Design: Aurora UI",
+    "content": "Keywords: Vibrant gradients, smooth blend, Northern Lights effect, mesh gradient, luminous\n\nTechnical: Multi-stop gradients, animated hue rotation, glow effects\n\nUse when: Landing pages, hero sections, creative portfolios\n\nAvoid: Text-heavy interfaces, professional/corporate contexts",
+    "notes": "Aurora-inspired UI design with vibrant gradients and Northern Lights effects.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "paintcan",
+    "pinned": false
+  },
+  {
+    "id": "1738153301008",
+    "type": "prompts",
+    "name": "Design: Soft UI (Neumorphism 2.0)",
+    "content": "Keywords: Soft shadows, subtle gradients, rounded corners (12-16px), monochromatic, tactile\n\nTechnical: box-shadow: inset + outset, same-color palette, minimal contrast\n\nUse when: Mobile apps, minimalist interfaces, wellness/health apps\n\nAvoid: Complex data displays, accessibility-critical applications",
+    "notes": "Soft UI evolution (Neumorphism 2.0) with subtle shadows and tactile elements.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "paintcan",
+    "pinned": false
+  },
+  {
+    "id": "1738153301009",
+    "type": "prompts",
+    "name": "Palette: Trust & Professional",
+    "content": "Industry: Finance, Healthcare, Enterprise\n\nColors:\n--primary: #0F172A (Navy)\n--cta: #3B82F6 (Blue)\n--background: #F8FAFC (Light Grey)\n--text: #1E293B (Slate)\n--accent: #3B82F6 (Bright Blue)\n\nMood: Reliable, secure, established",
+    "notes": "Professional color palette for corporate and enterprise applications.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "symbol-color",
+    "pinned": false
+  },
+  {
+    "id": "1738153301010",
+    "type": "prompts",
+    "name": "Palette: Vibrant & Modern",
+    "content": "Industry: Tech Startups, Creative Tools\n\nColors:\n--primary: #6366F1 (Indigo)\n--cta: #10B981 (Emerald)\n--background: #FFFFFF (Pure White)\n--text: #1E293B (Slate)\n--accent: #F59F0B (Amber)\n\nMood: Innovative, energetic, forward-thinking",
+    "notes": "Modern vibrant palette for tech startups and creative applications.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "symbol-color",
+    "pinned": false
+  },
+  {
+    "id": "1738153301011",
+    "type": "prompts",
+    "name": "Palette: Luxury & Premium",
+    "content": "Industry: High-end Products, Fashion\n\nColors:\n--primary: #1C1917 (Stone Dark)\n--cta: #CA8A04 (Gold)\n--background: #FAFAF9 (Cream)\n--text: #292524 (Warm Black)\n--accent: #78716C (Taupe)\n\nMood: Sophisticated, exclusive, timeless",
+    "notes": "Luxury color palette for premium brands and high-end products.",
+    "color": "var(--vscode-terminal-ansiMagenta)",
+    "icon": "symbol-color",
+    "pinned": false
+  },
+  {
+    "id": "1738153301012",
+    "type": "prompts",
+    "name": "Design: Accessibility (WCAG)",
+    "content": "Color Contrast:\n- Text: Minimum 4.5:1 (AA), 7:1 (AAA)\n- Large text: Minimum 3:1 (AA), 4.5:1 (AAA)\n- UI components: Minimum 3:1\n\nInteraction:\n- Tap targets: 44x44px minimum\n- Focus indicators: Visible 2px outline\n- Keyboard navigation: Full support\n\nContent:\n- Alt text for images\n- ARIA labels for interactive elements\n- Semantic HTML structure",
+    "notes": "WCAG 2.1 accessibility guidelines for inclusive design.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "law",
+    "pinned": true
+  },
+  {
+    "id": "1738153301013",
+    "type": "prompts",
+    "name": "Design: Typography System",
+    "content": "Font Scale (Modular 1.25):\n- h1: 3.052rem (48.83px)\n- h2: 2.441rem (39.06px)\n- h3: 1.953rem (31.25px)\n- h4: 1.563rem (25px)\n- h5: 1.25rem (20px)\n- body: 1rem (16px)\n- small: 0.8rem (12.8px)\n\nLine Height:\n- Headings: 1.2\n- Body: 1.5-1.6\n- Dense UI: 1.4\n\nFont Weight:\n- Regular: 400\n- Medium: 500\n- Semibold: 600\n- Bold: 700",
+    "notes": "Harmonious typography system with modular scale and proper hierarchy.",
+    "color": "var(--vscode-terminal-ansiCyan)",
+    "icon": "pencil",
+    "pinned": false
+  },
+  {
+    "id": "1738153301014",
+    "type": "prompts",
+    "name": "Design: Spacing System (8pt Grid)",
+    "content": "Base Unit: 8px\n\nSpacing Scale:\n- xs: 4px (0.5 unit)\n- sm: 8px (1 unit)\n- md: 16px (2 units)\n- lg: 24px (3 units)\n- xl: 32px (4 units)\n- 2xl: 48px (6 units)\n- 3xl: 64px (8 units)\n\nComponent Padding:\n- Button: 12px 24px\n- Input: 12px 16px\n- Card: 24px\n- Section: 48px 0",
+    "notes": "Consistent 8-point grid spacing system for visual harmony.",
+    "color": "var(--vscode-charts-orange)",
+    "icon": "symbol-ruler",
+    "pinned": false
+  },
+  {
+    "id": "1738153301015",
+    "type": "prompts",
+    "name": "Design: Component Patterns",
+    "content": "Buttons:\n- Primary: High contrast, single CTA\n- Secondary: Outlined, less prominent\n- Ghost: Text-only, minimal visual weight\n- States: Default, Hover, Active, Disabled\n\nInputs:\n- Label position: Top (mobile) or Left (desktop)\n- Error states: Red border + helper text\n- Success states: Green checkmark\n- Placeholder: 60% opacity of text color\n\nCards:\n- Border radius: 8-12px\n- Shadow: 0 2px 8px rgba(0,0,0,0.1)\n- Hover: Lift effect with increased shadow",
+    "notes": "Common UI component design patterns and best practices.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "layout",
+    "pinned": false
+  },
+  {
+    "id": "1738153301016",
+    "type": "prompts",
+    "name": "Design: Animation Principles",
+    "content": "Duration:\n- Micro (hover, toggle): 100-200ms\n- Small (tooltip, dropdown): 200-300ms\n- Medium (modal, drawer): 300-400ms\n- Large (page transition): 400-600ms\n\nEasing:\n- Ease-out: Elements entering (cubic-bezier(0.0, 0, 0.2, 1))\n- Ease-in: Elements exiting (cubic-bezier(0.4, 0, 1, 1))\n- Ease-in-out: Elements moving (cubic-bezier(0.4, 0, 0.2, 1))\n\nPrinciples:\n- Purposeful: Every animation serves a function\n- Subtle: Don't distract from content\n- Performant: Use transform and opacity",
+    "notes": "Animation timing, easing, and performance guidelines.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "sparkle",
+    "pinned": false
+  },
+  {
+    "id": "1738153301017",
+    "type": "prompts",
+    "name": "Design: Responsive Breakpoints",
+    "content": "Mobile-First Approach:\n\nBreakpoints:\n- xs: 0-640px (Mobile)\n- sm: 640px-768px (Large Mobile)\n- md: 768px-1024px (Tablet)\n- lg: 1024px-1280px (Desktop)\n- xl: 1280px-1536px (Large Desktop)\n- 2xl: 1536px+ (Extra Large)\n\nFluid Typography:\n- Use clamp() for responsive font sizes\n- Example: clamp(1rem, 2vw, 1.5rem)\n\nContainer:\n- Max-width: 1280px\n- Padding: 16px (mobile), 24px (tablet), 48px (desktop)",
+    "notes": "Responsive design breakpoints and fluid scaling techniques.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "device-mobile",
+    "pinned": false
+  },
+  {
+    "id": "1738153301018",
+    "type": "prompts",
+    "name": "Design: Dark Mode Strategy",
+    "content": "Color Adjustments:\n- Don't just invert colors\n- Reduce white to off-white (#E5E5E5)\n- Pure black can be harsh, use #121212\n- Increase surface elevation with lighter grays\n\nContrast:\n- Maintain WCAG ratios in dark mode\n- Test with color blindness simulators\n\nImage Handling:\n- Reduce brightness of images (opacity: 0.8)\n- Use different images for dark/light if needed\n\nImplementation:\n- CSS custom properties\n- prefers-color-scheme media query\n- User toggle to override system preference",
+    "notes": "Guidelines for implementing effective dark mode interfaces.",
+    "color": "var(--vscode-terminal-ansiMagenta)",
+    "icon": "symbol-color",
+    "pinned": false
+  },
+  {
+    "id": "1738153301019",
+    "type": "prompts",
+    "name": "Design: Form Best Practices",
+    "content": "Layout:\n- Single column for better completion rates\n- Group related fields\n- Clear visual hierarchy\n\nLabels:\n- Always visible (not placeholder-only)\n- Position above input on mobile\n- Use sentence case\n\nValidation:\n- Inline validation after field blur\n- Clear, specific error messages\n- Success indicators for correct input\n- Disable submit until valid\n\nAccessibility:\n- Associate labels with inputs (for/id)\n- Use proper input types (email, tel, etc.)\n- Include autocomplete attributes",
+    "notes": "Form design patterns for better user experience and conversion.",
+    "color": "var(--vscode-charts-yellow)",
+    "icon": "checklist",
+    "pinned": false
+  },
+  {
+    "id": "1738153301020",
+    "type": "prompts",
+    "name": "Design: Micro-interactions",
+    "content": "Button Feedback:\n- Hover: Scale 1.02, brightness increase\n- Active: Scale 0.98\n- Ripple effect on click\n\nLoading States:\n- Skeleton screens for content\n- Spinner for actions\n- Progress bars for multi-step\n\nToasts/Notifications:\n- Slide in from top-right\n- Auto-dismiss after 3-5 seconds\n- Include close button\n- Stack multiple notifications\n\nPage Transitions:\n- Fade between views\n- Slide for hierarchical navigation\n- Maintain scroll position on back",
+    "notes": "Micro-interaction patterns that enhance user experience.",
+    "color": "var(--vscode-terminal-ansiBrightGreen)",
+    "icon": "sparkle",
+    "pinned": false
+  },
+  {
+    "id": "1738153301021",
+    "type": "prompts",
+    "name": "AI Prompt: React Component",
+    "content": "You are an expert React developer. Create a reusable [component name] component that:\n- Uses TypeScript with proper type definitions\n- Implements [specific features]\n- Includes accessibility (ARIA labels, keyboard navigation)\n- Uses [Tailwind CSS / styled-components] for styling\n- Handles all states: default, hover, active, disabled, error\n- Is fully responsive (mobile-first)\n- Includes JSDoc comments\n\nExample usage should be shown in code comments.",
+    "notes": "Template for generating production-ready React components with AI.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "code",
+    "pinned": true
+  },
+  {
+    "id": "1738153301022",
+    "type": "prompts",
+    "name": "AI Prompt: Debug Error",
+    "content": "I'm getting an error in my [language/framework] code.\n\nError message:\n[paste full error message and stack trace]\n\nRelevant code:\n[paste code snippet]\n\nContext:\n- Environment: [browser/Node.js/etc.]\n- Dependencies: [list relevant packages and versions]\n- What I've tried: [attempted solutions]\n\nGoal: [what the code should do]\n\nPlease:\n1. Explain the root cause\n2. Suggest a fix with code\n3. Explain why this solution works\n4. Suggest ways to prevent similar errors",
+    "notes": "Structured debugging prompt for getting effective AI help with errors.",
+    "color": "var(--vscode-charts-red)",
+    "icon": "bug",
+    "pinned": false
+  },
+  {
+    "id": "1738153301023",
+    "type": "prompts",
+    "name": "AI Prompt: Code Review",
+    "content": "Review the following [language] code for:\n- Potential bugs and logical errors\n- Security vulnerabilities\n- Performance bottlenecks\n- Code smells and anti-patterns\n- SOLID principles violations\n- Better naming conventions\n- Missing error handling\n- Accessibility issues (if UI code)\n\nGoal: [what the code does]\n\n[paste code]\n\nProvide:\n1. Issues found (with severity: critical/high/medium/low)\n2. Specific improvements with code examples\n3. Best practices recommendations",
+    "notes": "Comprehensive code review prompt for quality improvements.",
+    "color": "var(--vscode-charts-yellow)",
+    "icon": "checklist",
+    "pinned": false
+  },
+  {
+    "id": "1738153301024",
+    "type": "prompts",
+    "name": "AI Prompt: Performance Optimization",
+    "content": "Optimize this [framework/language] code for performance:\n\nCurrent code:\n[paste code]\n\nContext:\n- This code handles [describe scenario]\n- Performance issue: [describe problem, e.g., slow rendering, high memory]\n- Scale: [data size, user count, etc.]\n\nOptimize for:\n- Rendering performance (use React.memo, useMemo, useCallback)\n- Bundle size reduction\n- Memory efficiency\n- Network requests (caching, batching)\n- Load time improvements\n\nProvide:\n1. Optimized code with explanations\n2. Performance metrics to measure\n3. Before/after comparison",
+    "notes": "Performance optimization prompt with specific metrics and techniques.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "rocket",
+    "pinned": false
+  },
+  {
+    "id": "1738153301025",
+    "type": "prompts",
+    "name": "AI Prompt: Unit Tests",
+    "content": "Generate comprehensive unit tests for this code:\n\n[paste code]\n\nRequirements:\n- Testing framework: [Jest/Vitest/etc.]\n- Test library: [React Testing Library/etc.]\n- Coverage: All functions, edge cases, error states\n- Mock external dependencies\n- Test accessibility (if UI)\n- Follow AAA pattern (Arrange, Act, Assert)\n\nInclude tests for:\n1. Happy path scenarios\n2. Edge cases (empty data, null, undefined)\n3. Error handling\n4. User interactions (if UI)\n5. Async operations\n\nUse descriptive test names.",
+    "notes": "Comprehensive testing prompt for generating quality unit tests.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "beaker",
+    "pinned": false
+  },
+  {
+    "id": "1738153301026",
+    "type": "prompts",
+    "name": "AI Prompt: API Endpoint",
+    "content": "Create a RESTful API endpoint in [language/framework]:\n\nEndpoint: [METHOD] /api/[resource]\n\nRequirements:\n- Input validation with [Zod/Joi/etc.]\n- Error handling (400, 401, 403, 404, 500)\n- Database: [PostgreSQL/MongoDB/etc.]\n- Authentication: [JWT/OAuth/etc.]\n- Rate limiting\n- Logging\n- TypeScript types\n- OpenAPI/Swagger documentation\n\nInclude:\n1. Route handler\n2. Service layer\n3. Database query\n4. Response format (JSON)\n5. Error responses\n6. Example request/response",
+    "notes": "Full-stack API endpoint creation with best practices.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "server",
+    "pinned": false
+  },
+  {
+    "id": "1738153301027",
+    "type": "prompts",
+    "name": "AI Prompt: Refactor Legacy Code",
+    "content": "Refactor this legacy code to modern standards:\n\n[paste code]\n\nTarget:\n- Language/Framework: [e.g., ES6+, React 18]\n- Goals: [readability, performance, maintainability]\n\nRequirements:\n1. Convert to modern syntax (async/await, destructuring, etc.)\n2. Extract reusable functions/components\n3. Add TypeScript types\n4. Improve naming conventions\n5. Add error handling\n6. Remove code duplication\n7. Add comments for complex logic\n8. Maintain backward compatibility: [Yes/No]\n\nProvide:\n- Refactored code\n- Migration guide\n- Breaking changes (if any)",
+    "notes": "Legacy code modernization with step-by-step refactoring.",
+    "color": "var(--vscode-charts-orange)",
+    "icon": "tools",
+    "pinned": false
+  },
+  {
+    "id": "1738153301028",
+    "type": "prompts",
+    "name": "AI Prompt: React Native App",
+    "content": "Create a React Native app with Expo for [app purpose]:\n\nFeatures:\n- [List core features]\n- Navigation: Tab navigation with [X] screens\n- Authentication: [Firebase/Supabase/etc.]\n- State management: [Zustand/Redux/Context]\n- UI library: [React Native Elements/etc.]\n\nScreens needed:\n1. [Screen name]: [description]\n2. [Screen name]: [description]\n\nRequirements:\n- TypeScript\n- Dark mode support\n- Offline capability\n- Push notifications\n- Responsive design (iOS + Android)\n- Accessibility features\n\nProvide:\n- App structure\n- Navigation setup\n- Core screens with styling\n- State management setup",
+    "notes": "Complete React Native app generation with modern stack.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "device-mobile",
+    "pinned": false
+  },
+  {
+    "id": "1738153301029",
+    "type": "prompts",
+    "name": "AI Prompt: Accessibility Audit",
+    "content": "Audit this component/page for WCAG 2.1 AA compliance:\n\n[paste code]\n\nCheck for:\n1. Color contrast (text: 4.5:1, large text: 3:1, UI: 3:1)\n2. Keyboard navigation (tab order, focus indicators)\n3. Screen reader support (ARIA labels, roles, live regions)\n4. Form accessibility (labels, error messages, required fields)\n5. Interactive element size (44x44px minimum)\n6. Semantic HTML structure\n7. Alt text for images\n8. Focus traps in modals\n9. Skip navigation links\n\nProvide:\n- Issues found with severity\n- Fixed code\n- Testing recommendations",
+    "notes": "Complete accessibility audit prompt following WCAG guidelines.",
+    "color": "var(--vscode-charts-green)",
+    "icon": "law",
+    "pinned": false
+  },
+  {
+    "id": "1738153301030",
+    "type": "prompts",
+    "name": "AI Prompt: Database Schema",
+    "content": "Design a database schema for [purpose]:\n\nRequirements:\n- Database: [PostgreSQL/MongoDB/etc.]\n- ORM: [Prisma/TypeORM/Mongoose/etc.]\n\nEntities needed:\n1. [Entity name]: [description]\n2. [Entity name]: [description]\n\nRelationships:\n- [describe relationships]\n\nInclude:\n1. Schema definition (SQL/Prisma/etc.)\n2. Indexes for performance\n3. Foreign key constraints\n4. Default values\n5. Validation rules\n6. Migration files\n7. TypeScript types\n8. Sample queries\n\nConsider:\n- Data integrity\n- Query performance\n- Scalability",
+    "notes": "Database schema design with migrations and types.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "database",
+    "pinned": false
+  },
+  {
+    "id": "1738153301031",
+    "type": "prompts",
+    "name": "AI Prompt: Security Review",
+    "content": "Security review for this [language/framework] code:\n\n[paste code]\n\nCheck for:\n1. SQL Injection vulnerabilities\n2. XSS (Cross-Site Scripting)\n3. CSRF protection\n4. Authentication flaws\n5. Authorization bypasses\n6. Sensitive data exposure\n7. Insecure dependencies\n8. API key leaks\n9. Input validation\n10. Rate limiting\n11. CORS configuration\n12. Password hashing (bcrypt, Argon2)\n\nProvide:\n- Vulnerabilities (with OWASP classification)\n- Severity rating (Critical/High/Medium/Low)\n- Exploitability\n- Remediation code\n- Security best practices",
+    "notes": "Security audit prompt following OWASP standards.",
+    "color": "var(--vscode-charts-red)",
+    "icon": "lock",
+    "pinned": false
+  },
+  {
+    "id": "1738153301032",
+    "type": "prompts",
+    "name": "AI Prompt: TypeScript Migration",
+    "content": "Convert this JavaScript code to TypeScript:\n\n[paste JavaScript code]\n\nRequirements:\n1. Add comprehensive type definitions\n2. Use interfaces for objects\n3. Use enums where appropriate\n4. Add generic types for reusable functions\n5. Use strict mode (noImplicitAny, strictNullChecks)\n6. Type all function parameters and returns\n7. Use utility types (Partial, Pick, Omit, etc.)\n8. Add JSDoc for complex types\n\nProvide:\n- Fully typed code\n- Type definitions file (.d.ts) if needed\n- Explanation of type choices",
+    "notes": "JavaScript to TypeScript migration with strict typing.",
+    "color": "var(--vscode-terminal-ansiCyan)",
+    "icon": "code",
+    "pinned": false
+  },
+  {
+    "id": "1738153301033",
+    "type": "prompts",
+    "name": "AI Prompt: CSS Architecture",
+    "content": "Create a CSS architecture for [project type]:\n\nApproach: [Tailwind/CSS Modules/Styled Components/BEM]\n\nRequirements:\n1. Design tokens (colors, spacing, typography, shadows)\n2. Utility classes for common patterns\n3. Component-specific styles\n4. Responsive breakpoints\n5. Dark mode support\n6. Animation utilities\n7. Print styles\n8. CSS custom properties\n\nOrganization:\n- File structure\n- Naming conventions\n- Style composition\n- Optimization strategy\n\nProvide:\n- Base styles\n- Configuration file\n- Example component styles\n- Documentation",
+    "notes": "Complete CSS architecture setup with design system.",
+    "color": "var(--vscode-charts-purple)",
+    "icon": "paintcan",
+    "pinned": false
+  },
+  {
+    "id": "1738153301034",
+    "type": "prompts",
+    "name": "AI Prompt: Next.js App",
+    "content": "Create a Next.js 14+ app with App Router:\n\nProject: [name and purpose]\n\nFeatures:\n- [list features]\n- Authentication: [NextAuth/Clerk/etc.]\n- Database: [Prisma + PostgreSQL/etc.]\n- Styling: [Tailwind CSS/etc.]\n- Deployment: [Vercel/etc.]\n\nPages/Routes:\n1. / - Homepage\n2. [list other routes]\n\nRequirements:\n- TypeScript\n- Server Components where possible\n- API routes with route handlers\n- Metadata for SEO\n- Loading and error states\n- Server actions for mutations\n- Responsive design\n- Image optimization\n\nProvide:\n- Project structure\n- Core pages\n- API routes\n- Database schema\n- Auth setup",
+    "notes": "Modern Next.js app with App Router and server components.",
+    "color": "var(--vscode-charts-blue)",
+    "icon": "browser",
+    "pinned": false
+  },
+  {
+    "id": "1738153301035",
+    "type": "prompts",
+    "name": "AI Prompt: Code Documentation",
+    "content": "Generate comprehensive documentation for this code:\n\n[paste code]\n\nInclude:\n1. Function/Class overview\n2. Parameters (type, description, required/optional, default)\n3. Return value (type, description)\n4. Throws/Errors (what exceptions, when)\n5. Usage examples (3-5 real-world scenarios)\n6. Edge cases and caveats\n7. Performance considerations\n8. Related functions/classes\n9. TypeScript types (if applicable)\n10. @deprecated if legacy\n\nFormat: [JSDoc/TSDoc/Markdown]\n\nStyle:\n- Clear and concise\n- Technical but readable\n- Include code examples\n- Link to related docs",
+    "notes": "Complete code documentation generation with examples.",
+    "color": "var(--vscode-charts-yellow)",
+    "icon": "note",
+    "pinned": false
+  }
+]
