@@ -3,7 +3,7 @@
   "displayName": "Command & Prompt Tracker",
   "publisher": "skdsam",
   "description": "Manage reusable commands and prompts with a premium native UI.",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "icon": "media/icon.png",
   "repository": {
     "type": "git",

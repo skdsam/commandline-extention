@@ -5,14 +5,13 @@ A VS Code extension for managing reusable commands and prompts with a premium na
 ## Features
 
 - **Icon-Based Grouping** — Commands and prompts are automatically organized by icon type into collapsible groups for better management
-- **Dual-Tab Organization** — Separate tabs for Commands and Prompts
-- **Universal Search** — Filter entries instantly across all groups
-- **Customizable Icons & Colors** — Personalize each entry with VS Code Codicons and a curated color palette
-- **Pin Important Entries** — Pinned items appear at the top with a red 📌 indicator
-- **One-Click Copy** — Click any entry to copy its content to clipboard
+- **Triple-Tab Organization** — Separate tabs for Commands, Prompts, and a dedicated **Pinned** items view
+- **Universal Search** — Filter entries instantly across all categories
+- **Enhanced Design Toolkit** — Includes 15+ professional AI prompts for web design, UI/UX, accessibility, and refactoring
+- **Customizable Icons & Colors** — Personalize each entry with VS Code Codicons and a curated color palette (including new design-specific icons: Paintcan, Layout, Pencil, Ruler)
 - **Git Sync** — Sync your commands and prompts across machines via Git
 - **GitHub Token Support** — Access private repositories and avoid rate limits with GitHub token integration
-- **Missing Repository Discovery** —Automatically detect and download missing repos from your GitHub account
+- **Missing Repository Discovery** — Automatically detect and download missing repos from your GitHub account
 
 ## Installation
 
@@ -21,13 +20,13 @@ A VS Code extension for managing reusable commands and prompts with a premium na
 1. Download the `.vsix` file
 2. In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
 3. Run **Extensions: Install from VSIX...**
-4. Select the downloaded `.vsix` file
+4. Select the downloaded `.vsix` file (e.g., `commandline-extention-1.2.3.vsix`)
 
 ### From Source
 
 ```bash
 git clone https://github.com/skdsam/commandline-extention.git
-cd command-extention
+cd commandline-extention
 npm install
 npm run compile
 ```
@@ -49,11 +48,11 @@ Click the **Command Tracker** icon in the Activity Bar (left panel) to open the 
 
 Entries will be automatically grouped by the icon you selected.
 
-### Navigating Groups
+### Navigating Categories
 
-- **Click a group header** to expand/collapse that icon group
-- **Search** works across all groups and automatically shows matching results
-- Each group header shows the count of items in that category
+- **Commands** — All command-style entries (Folder icon by default)
+- **Prompts** — All AI and text prompts (Terminal icon by default)
+- **Pinned** — Quick access to all pinned items across both categories
 
 ### Managing Entries
 
@@ -100,27 +99,30 @@ This gives you two options:
 
 ## Icons
 
-Entries default to:
-- **Terminal** icon for Prompts
-- **Folder** icon for Commands
+Over 40 codicons are available for customization, including new design-themed icons:
+- **Paintcan** (Design)
+- **Layout**
+- **Pencil**
+- **Symbol Ruler**
+- **Browser**
+- **Symbol Color**
 
-Over 30 codicons are available for customization, each creating its own collapsible group.
+## What's New in Version 1.2.3
 
-## What's New in Version 1.2.0
+📌 **Dedicated Pinned Tab** — A new tab that brings all your most important items into a single view. Items added while in the Pinned tab are automatically pinned for you.
 
-🎯 **Icon-Based Grouping** — The biggest update yet! Your commands and prompts are now automatically organized into collapsible groups based on their icon type. This makes managing large collections much easier:
+🎨 **Professional AI Prompts** — Pre-loaded with a library of 15+ design and coding prompts (Glassmorphism, Aurora UI, Accessibility Audits, Debugging, etc.) to help you get the best code from AI.
 
-- Groups automatically collapse/expand
-- Search works across all groups
-- Clean, organized interface
-- Group headers show item counts
+🛠️ **Design Toolkit** — New icons specifically for UI/UX and web design workflows.
+
+📏 **Improved UI Layout** — Optimized sidebar buttons and spacing for better usability.
 
 ## Development
 
 ### Project Structure
 
 ```
-command-extention/
+commandline-extention/
 ├── src/
 │   ├── extension.ts    # Extension entry point
 │   └── provider.ts     # Webview provider
