@@ -232,10 +232,12 @@
     let state = {
         activeTab: 'commands',
         entries: [],
+        subscriptions: [],
         searchQuery: '',
         selectedIcon: ICONS[0],
         selectedColor: COLORS[0],
-        collapsedGroups: {} // Track which icon groups are collapsed {iconName: true/false}
+        collapsedGroups: {},
+        isSubscribedReposOpen: false
     };
 
     // Load initial data
@@ -528,8 +530,15 @@
         const message = event.data;
         switch (message.type) {
             case 'dataLoaded':
-                state.entries = message.value || [];
+                if (message.value && message.value.items) {
+                    state.entries = message.value.items;
+                    state.subscriptions = message.value.subscriptions || [];
+                } else {
+                    state.entries = message.value || [];
+                    state.subscriptions = [];
+                }
                 render();
+                renderSubscriptions();
                 break;
             case 'triggerAdd':
                 addBtn.click();
@@ -596,9 +605,11 @@
             .filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab)
             .filter(e => {
                 const query = state.searchQuery;
-                return e.name.toLowerCase().includes(query) ||
+                const matchesSearch = e.name.toLowerCase().includes(query) ||
                     e.content.toLowerCase().includes(query) ||
-                    (e.notes && e.notes.toLowerCase().includes(query));
+                    (e.notes && e.notes.toLowerCase().includes(query)) ||
+                    (e.source && e.source.toLowerCase().includes(query));
+                return matchesSearch;
             })
             .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
@@ -651,20 +662,27 @@
                     const iconColor = entry.color || 'var(--text-color)';
                     const pinIndicator = entry.pinned ? '<span class="pin-indicator" style="color: #e53935; margin-left: 4px;">📌</span>' : '';
 
+                    const sourceBadge = entry.source && entry.source !== 'local' ?
+                        `<span class="entry-source-badge" title="Source: ${entry.source}">@${entry.source}</span>` :
+                        '';
+
                     el.innerHTML = `
                         <div class="entry-icon">
                             <span class="codicon codicon-${iconName}" style="color: ${iconColor}"></span>
                         </div>
                         ${pinIndicator}
                         <div class="entry-info">
-                            <div class="entry-name" title="${entry.name}">${entry.name}</div>
+                            <div class="entry-name" title="${entry.name}">
+                                ${entry.name}
+                                ${sourceBadge}
+                            </div>
                             ${entry.notes ? `<div class="entry-notes" title="${entry.notes}">${entry.notes}</div>` : ''}
                         </div>
                         <div class="entry-actions">
                             <button class="action-btn copy-btn" title="Copy Content"><span class="codicon codicon-copy"></span></button>
-                            <button class="action-btn edit-btn" title="Edit Entry"><span class="codicon codicon-edit"></span></button>
+                            ${(!entry.source || entry.source === 'local') ? `<button class="action-btn edit-btn" title="Edit Entry"><span class="codicon codicon-edit"></span></button>` : ''}
                             <button class="action-btn pin-btn" title="${entry.pinned ? 'Unpin' : 'Pin'}"><span class="codicon codicon-${entry.pinned ? 'pin' : 'pinned'}"></span></button>
-                            <button class="action-btn delete-btn" title="Delete Entry"><span class="codicon codicon-trash"></span></button>
+                            ${(!entry.source || entry.source === 'local') ? `<button class="action-btn delete-btn" title="Delete Entry"><span class="codicon codicon-trash"></span></button>` : ''}
                         </div>
                     `;
 
@@ -683,10 +701,13 @@
                         });
                     });
 
-                    el.querySelector('.edit-btn').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        editEntry(entry.id);
-                    });
+                    const editBtn = el.querySelector('.edit-btn');
+                    if (editBtn) {
+                        editBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            editEntry(entry.id);
+                        });
+                    }
 
                     el.querySelector('.pin-btn').addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -695,18 +716,92 @@
                         render();
                     });
 
-                    el.querySelector('.delete-btn').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        state.entries = state.entries.filter(e => e.id !== entry.id);
-                        save();
-                        render();
-                    });
+                    const deleteBtn = el.querySelector('.delete-btn');
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            state.entries = state.entries.filter(e => e.id !== entry.id);
+                            save();
+                            render();
+                        });
+                    }
 
                     groupContainer.appendChild(el);
                 });
 
                 listContainer.appendChild(groupContainer);
             }
+        });
+    }
+
+    function renderSubscriptions() {
+        // We'll inject the subscription UI into the sidebar
+        let container = document.getElementById('subscriptions-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'subscriptions-container';
+            container.className = 'subscriptions-container';
+            const footer = document.querySelector('.sync-footer');
+            footer.parentNode.insertBefore(container, footer);
+        }
+
+        container.innerHTML = `
+            <div class="subscriptions-header" id="subs-header">
+                <span class="codicon codicon-chevron-${state.isSubscribedReposOpen ? 'down' : 'right'}"></span>
+                <span>Manage Sources</span>
+                <span class="group-count">(${state.subscriptions.length})</span>
+                <div style="flex:1"></div>
+                <span class="codicon codicon-refresh" id="refresh-subs-btn" title="Refresh All" style="cursor:pointer; opacity:0.6"></span>
+            </div>
+            <div class="subscriptions-list ${state.isSubscribedReposOpen ? '' : 'hidden'}" id="subs-list">
+                ${state.subscriptions.map(sub => `
+                    <div class="subscription-item">
+                        <div class="sub-status-dot ${sub.status === 'active' ? 'active' : 'unreachable'}" title="${sub.status}"></div>
+                        <span class="sub-username" title="${sub.url}">@${sub.username}</span>
+                        <div class="sub-actions">
+                             <span class="codicon codicon-trash remove-sub-btn action-btn" data-id="${sub.id}" title="Remove Source" style="font-size:12px"></span>
+                        </div>
+                    </div>
+                `).join('')}
+                <div class="add-subscription-row">
+                    <input type="text" id="add-sub-input" placeholder="GitHub Repo URL..." style="height:22px"/>
+                    <button id="add-sub-btn">+</button>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('subs-header').addEventListener('click', (e) => {
+            if (e.target.id === 'refresh-subs-btn') {
+                e.stopPropagation();
+                vscode.postMessage({
+                    type: 'refreshSubscriptions'
+                });
+                return;
+            }
+            state.isSubscribedReposOpen = !state.isSubscribedReposOpen;
+            renderSubscriptions();
+        });
+
+        document.getElementById('add-sub-btn').addEventListener('click', () => {
+            const input = document.getElementById('add-sub-input');
+            const url = input.value.trim();
+            if (url) {
+                vscode.postMessage({
+                    type: 'addSubscription',
+                    value: url
+                });
+                input.value = '';
+            }
+        });
+
+        document.querySelectorAll('.remove-sub-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                vscode.postMessage({
+                    type: 'removeSubscription',
+                    value: btn.dataset.id
+                });
+            });
         });
     }
 })();

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as https from 'https';
 import { exec } from 'child_process';
 
 export class CommandTrackerProvider implements vscode.WebviewViewProvider {
@@ -26,7 +27,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-        webviewView.webview.onDidReceiveMessage(data => {
+        webviewView.webview.onDidReceiveMessage(async data => {
             switch (data.type) {
                 case 'saveData':
                     this._saveData(data.value);
@@ -40,6 +41,16 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                     break;
                 case 'sync':
                     this.syncWithGit();
+                    break;
+                case 'addSubscription':
+                    await this._addSubscription(data.value);
+                    break;
+                case 'removeSubscription':
+                    await this._removeSubscription(data.value);
+                    break;
+                case 'refreshSubscriptions':
+                case 'checkForUpdates':
+                    await this._refreshSubscriptions();
                     break;
             }
         });
@@ -242,7 +253,20 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
             if (!fs.existsSync(this._context.globalStorageUri.fsPath)) {
                 fs.mkdirSync(this._context.globalStorageUri.fsPath, { recursive: true });
             }
-            fs.writeFileSync(storagePath, JSON.stringify(data, null, 2));
+
+            // Ensure we are saving in the correct object format
+            let dataToSave = data;
+            if (Array.isArray(data)) {
+                // If the frontend sent an array, it likely doesn't have the subscriptions part yet
+                // We should try to preserve existing subscriptions if we have them
+                const existing = this._getRawData();
+                dataToSave = {
+                    items: data,
+                    subscriptions: existing.subscriptions || []
+                };
+            }
+
+            fs.writeFileSync(storagePath, JSON.stringify(dataToSave, null, 2));
 
             // Auto-sync with Git after each save
             await this._autoSync();
@@ -288,16 +312,230 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    private _loadData() {
+    private _getRawData(): any {
         try {
             const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
             if (fs.existsSync(storagePath)) {
-                const data = fs.readFileSync(storagePath, 'utf8');
-                this._view?.webview.postMessage({ type: 'dataLoaded', value: JSON.parse(data) });
+                const content = fs.readFileSync(storagePath, 'utf8');
+                const parsed = JSON.parse(content);
+
+                // Migration: If it's an array, convert to object
+                if (Array.isArray(parsed)) {
+                    return {
+                        items: parsed,
+                        subscriptions: []
+                    };
+                }
+                return parsed;
             }
+        } catch (e) {
+            console.error('Failed to read raw data', e);
+        }
+        return { items: [], subscriptions: [] };
+    }
+
+    private _loadData() {
+        try {
+            const data = this._getRawData();
+            this._view?.webview.postMessage({ type: 'dataLoaded', value: data });
         } catch (err: any) {
             vscode.window.showErrorMessage(`Failed to load data: ${err.message}`);
         }
+    }
+
+    private async _addSubscription(url: string) {
+        // Basic URL validation and normalization
+        // Convert https://github.com/user/repo to raw URL: https://raw.githubusercontent.com/user/repo/main/data.json
+        let cleanUrl = url.trim().replace(/\/$/, "");
+        if (!cleanUrl.startsWith('http')) {
+            vscode.window.showErrorMessage('Please enter a valid GitHub URL');
+            return;
+        }
+
+        const match = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (!match) {
+            vscode.window.showErrorMessage('Invalid GitHub repository URL');
+            return;
+        }
+
+        const username = match[1];
+        const repo = match[2];
+        const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/main/data.json`;
+
+        const data = this._getRawData();
+        if (data.subscriptions.some((s: any) => s.url === cleanUrl)) {
+            vscode.window.showInformationMessage('This repository is already added');
+            return;
+        }
+
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Adding ${username}'s commands...`,
+            cancellable: false
+        }, async () => {
+            try {
+                const friendData: any = await this._fetchJson(rawUrl);
+                const friendItems = Array.isArray(friendData) ? friendData : (friendData.items || []);
+
+                // Merge items
+                const newItems = [...data.items];
+                let addedCount = 0;
+                let updatedCount = 0;
+
+                friendItems.forEach((fItem: any) => {
+                    // Check if we already have this item from this source via originalId
+                    const existingIndex = newItems.findIndex(i => i.source === username && i.originalId === fItem.id);
+
+                    if (existingIndex !== -1) {
+                        // Update existing
+                        newItems[existingIndex] = {
+                            ...fItem,
+                            id: newItems[existingIndex].id, // Keep our local random ID
+                            source: username,
+                            originalId: fItem.id,
+                            pinned: newItems[existingIndex].pinned // Preserve our pin state
+                        };
+                        updatedCount++;
+                    } else {
+                        // Check if item with same name exists in local (conflict avoidance)
+                        const nameConflict = newItems.some(i => i.name === fItem.name && (!i.source || i.source === 'local'));
+
+                        if (!nameConflict) {
+                            newItems.push({
+                                ...fItem,
+                                id: Date.now() + Math.random().toString(36).substr(2, 9),
+                                source: username,
+                                originalId: fItem.id,
+                                pinned: false
+                            });
+                            addedCount++;
+                        }
+                    }
+                });
+
+                data.items = newItems;
+                data.subscriptions.push({
+                    id: Date.now().toString(),
+                    username: username,
+                    url: cleanUrl,
+                    status: 'active',
+                    lastSynced: new Date().toISOString()
+                });
+
+                await this._saveData(data);
+                this._loadData();
+                vscode.window.showInformationMessage(`Added ${username}: ${addedCount} new, ${updatedCount} updated.`);
+            } catch (err: any) {
+                vscode.window.showErrorMessage(`Failed to add subscription: ${err.message}`);
+            }
+        });
+    }
+
+    private async _removeSubscription(subscriptionId: string) {
+        const data = this._getRawData();
+        const subIndex = data.subscriptions.findIndex((s: any) => s.id === subscriptionId);
+
+        if (subIndex === -1) return;
+
+        const username = data.subscriptions[subIndex].username;
+        const confirm = await vscode.window.showWarningMessage(
+            `Remove @${username}'s subscription?`,
+            'Yes, and remove items', 'Yes, but keep items as archived', 'Cancel'
+        );
+
+        if (confirm === 'Cancel' || !confirm) return;
+
+        if (confirm === 'Yes, and remove items') {
+            data.items = data.items.filter((i: any) => i.source !== username);
+        } else {
+            // Label as archived
+            data.items = data.items.map((i: any) => {
+                if (i.source === username) {
+                    return { ...i, source: `${username} (Archived)` };
+                }
+                return i;
+            });
+        }
+
+        data.subscriptions.splice(subIndex, 1);
+        await this._saveData(data);
+        this._loadData();
+    }
+
+    private async _refreshSubscriptions() {
+        const data = this._getRawData();
+        if (data.subscriptions.length === 0) return;
+
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Checking for updates from friends...`,
+            cancellable: false
+        }, async () => {
+            for (const sub of data.subscriptions) {
+                try {
+                    const match = sub.url.match(/github\.com\/([^/]+)\/([^/]+)/);
+                    if (!match) continue;
+                    const username = match[1];
+                    const repo = match[2];
+                    const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/main/data.json`;
+
+                    const friendData = await this._fetchJson(rawUrl);
+                    const friendItems = Array.isArray(friendData) ? friendData : (friendData.items || []);
+
+                    friendItems.forEach((fItem: any) => {
+                        const existingIndex = data.items.findIndex((i: any) => i.source === username && i.originalId === fItem.id);
+                        if (existingIndex !== -1) {
+                            data.items[existingIndex] = {
+                                ...fItem,
+                                id: data.items[existingIndex].id,
+                                source: username,
+                                originalId: fItem.id,
+                                pinned: data.items[existingIndex].pinned
+                            };
+                        } else {
+                            // New item from friend
+                            const nameConflict = data.items.some((i: any) => i.name === fItem.name && (!i.source || i.source === 'local'));
+                            if (!nameConflict) {
+                                data.items.push({
+                                    ...fItem,
+                                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                                    source: username,
+                                    originalId: fItem.id,
+                                    pinned: false
+                                });
+                            }
+                        }
+                    });
+
+                    sub.status = 'active';
+                    sub.lastSynced = new Date().toISOString();
+                } catch (e) {
+                    sub.status = 'unreachable';
+                }
+            }
+            await this._saveData(data);
+            this._loadData();
+        });
+    }
+
+    private _fetchJson(url: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            https.get(url, (res) => {
+                if (res.statusCode !== 200) {
+                    reject(new Error(`Status Code: ${res.statusCode}`));
+                    return;
+                }
+                let data = '';
+                res.on('data', (chunk) => data += chunk);
+                res.on('end', () => {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+            }).on('error', reject);
+        });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
