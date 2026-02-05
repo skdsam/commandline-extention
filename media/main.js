@@ -345,6 +345,13 @@
             return;
         }
 
+        // Check for duplicate names (excluding current entry if editing)
+        const duplicate = state.entries.find(e => e.name.toLowerCase() === name.toLowerCase() && e.id !== editingId);
+        if (duplicate) {
+            alert(`An entry with the name "${name}" already exists.`);
+            return;
+        }
+
         try {
             if (editingId) {
                 const entry = state.entries.find(e => e.id === editingId);

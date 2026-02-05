@@ -240,10 +240,35 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                     }
 
                     if (pullSuccess) {
-                        progress.report({ message: "Pushing..." });
-                        await this._execGit(['push', '-u', 'origin', 'main']);
-                        vscode.window.showInformationMessage('Sync complete!');
-                        this._loadData(); // Reload in case pull changed data.json
+                        try {
+                            progress.report({ message: "Pushing..." });
+                            await this._execGit(['push', '-u', 'origin', 'main']);
+                            vscode.window.showInformationMessage('Sync complete!');
+                            this._loadData(); // Reload in case pull changed data.json
+                        } catch (pushErr: any) {
+                            if (pushErr.includes('[rejected]') || pushErr.includes('non-fast-forward')) {
+                                const resolution = await vscode.window.showWarningMessage(
+                                    'Sync Conflict: Your local version and the GitHub version have diverged. How would you like to resolve this?',
+                                    'Sync from GitHub (Overwrite Local)',
+                                    'Sync to GitHub (Overwrite Remote)',
+                                    'Cancel'
+                                );
+
+                                if (resolution === 'Sync from GitHub (Overwrite Local)') {
+                                    progress.report({ message: "Resetting to remote..." });
+                                    await this._execGit(['fetch', 'origin']);
+                                    await this._execGit(['reset', '--hard', 'origin/main']);
+                                    this._loadData();
+                                    vscode.window.showInformationMessage('Local data has been overwritten with the GitHub version.');
+                                } else if (resolution === 'Sync to GitHub (Overwrite Remote)') {
+                                    progress.report({ message: "Force pushing to remote..." });
+                                    await this._execGit(['push', '-f', 'origin', 'main']);
+                                    vscode.window.showInformationMessage('GitHub version has been overwritten with your local data.');
+                                }
+                            } else {
+                                throw pushErr;
+                            }
+                        }
                     }
                 } catch (err: any) {
                     vscode.window.showErrorMessage(`Sync failed: ${err}`);
@@ -274,6 +299,9 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 };
             }
 
+            // Deduplicate items before saving
+            dataToSave.items = this._deduplicate(dataToSave.items);
+
             fs.writeFileSync(storagePath, JSON.stringify(dataToSave, null, 2));
 
             // Auto-sync with Git after each save
@@ -281,6 +309,21 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         } catch (err: any) {
             vscode.window.showErrorMessage(`Failed to save data: ${err.message}`);
         }
+    }
+
+    private _deduplicate(items: any[]): any[] {
+        const seen = new Set();
+        return items.filter(item => {
+            // Key based on source (lowercased) and originalId for sourced items
+            // Key based on id for local items
+            const sourceKey = item.source ? item.source.toLowerCase() : 'local';
+            const idKey = item.originalId || item.id;
+            const key = `${sourceKey}:${idKey}`;
+
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
     }
 
     private async _autoSync() {
@@ -325,7 +368,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
             const url = await this._execGit(['remote', 'get-url', 'origin']);
             // Standard https or git@ format
             const match = url.match(/github\.com[:/]([^/]+)\//);
-            return match ? match[1] : null;
+            return match ? match[1].toLowerCase() : null;
         } catch (e) {
             return null;
         }
@@ -381,12 +424,12 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
             return;
         }
 
-        const username = match[1];
+        const username = match[1].toLowerCase();
         const repo = match[2];
         const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/main/data.json`;
 
         const data = this._getRawData();
-        if (data.subscriptions.some((s: any) => s.url === cleanUrl)) {
+        if (data.subscriptions.some((s: any) => s.url.toLowerCase() === cleanUrl.toLowerCase())) {
             vscode.window.showInformationMessage('This repository is already added');
             return;
         }
@@ -406,7 +449,10 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 let updatedCount = 0;
 
                 friendItems.forEach((fItem: any) => {
-                    const existingIndex = newItems.findIndex(i => i.source === username && i.originalId === fItem.id);
+                    const existingIndex = newItems.findIndex(i =>
+                        i.source && i.source.toLowerCase() === username &&
+                        (i.originalId === fItem.id || i.id === fItem.id)
+                    );
 
                     if (existingIndex !== -1) {
                         newItems[existingIndex] = {
@@ -494,7 +540,7 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 try {
                     const match = sub.url.match(/github\.com\/([^/]+)\/([^/]+)/);
                     if (!match) continue;
-                    const username = match[1];
+                    const username = match[1].toLowerCase();
                     const repo = match[2];
                     const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/main/data.json`;
 
@@ -502,7 +548,10 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                     const friendItems = Array.isArray(friendData) ? friendData : (friendData.items || []);
 
                     friendItems.forEach((fItem: any) => {
-                        const existingIndex = data.items.findIndex((i: any) => i.source === username && i.originalId === fItem.id);
+                        const existingIndex = data.items.findIndex((i: any) =>
+                            i.source && i.source.toLowerCase() === username &&
+                            (i.originalId === fItem.id || i.id === fItem.id)
+                        );
                         if (existingIndex !== -1) {
                             data.items[existingIndex] = {
                                 ...fItem,
