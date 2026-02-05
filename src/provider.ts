@@ -320,6 +320,17 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         }
     }
 
+    private async _getGithubUsername(): Promise<string | null> {
+        try {
+            const url = await this._execGit(['remote', 'get-url', 'origin']);
+            // Standard https or git@ format
+            const match = url.match(/github\.com[:/]([^/]+)\//);
+            return match ? match[1] : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     private _getRawData(): any {
         try {
             const storagePath = path.join(this._context.globalStorageUri.fsPath, 'data.json');
@@ -342,10 +353,15 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         return { items: [], subscriptions: [] };
     }
 
-    private _loadData() {
+    private async _loadData() {
         try {
             const data = this._getRawData();
-            this._view?.webview.postMessage({ type: 'dataLoaded', value: data });
+            const username = await this._getGithubUsername();
+            this._view?.webview.postMessage({
+                type: 'dataLoaded',
+                value: data,
+                username: username
+            });
         } catch (err: any) {
             vscode.window.showErrorMessage(`Failed to load data: ${err.message}`);
         }
@@ -353,7 +369,6 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
 
     private async _addSubscription(url: string) {
         // Basic URL validation and normalization
-        // Convert https://github.com/user/repo to raw URL: https://raw.githubusercontent.com/user/repo/main/data.json
         let cleanUrl = url.trim().replace(/\/$/, "");
         if (!cleanUrl.startsWith('http')) {
             vscode.window.showErrorMessage('Please enter a valid GitHub URL');
@@ -391,21 +406,18 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 let updatedCount = 0;
 
                 friendItems.forEach((fItem: any) => {
-                    // Check if we already have this item from this source via originalId
                     const existingIndex = newItems.findIndex(i => i.source === username && i.originalId === fItem.id);
 
                     if (existingIndex !== -1) {
-                        // Update existing
                         newItems[existingIndex] = {
                             ...fItem,
-                            id: newItems[existingIndex].id, // Keep our local random ID
+                            id: newItems[existingIndex].id,
                             source: username,
                             originalId: fItem.id,
-                            pinned: newItems[existingIndex].pinned // Preserve our pin state
+                            pinned: newItems[existingIndex].pinned
                         };
                         updatedCount++;
                     } else {
-                        // Check if item with same name exists in local (conflict avoidance)
                         const nameConflict = newItems.some(i => i.name === fItem.name && (!i.source || i.source === 'local'));
 
                         if (!nameConflict) {
@@ -456,7 +468,6 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         if (confirm === 'Yes, and remove items') {
             data.items = data.items.filter((i: any) => i.source !== username);
         } else {
-            // Label as archived
             data.items = data.items.map((i: any) => {
                 if (i.source === username) {
                     return { ...i, source: `${username} (Archived)` };
@@ -501,7 +512,6 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                                 pinned: data.items[existingIndex].pinned
                             };
                         } else {
-                            // New item from friend
                             const nameConflict = data.items.some((i: any) => i.name === fItem.name && (!i.source || i.source === 'local'));
                             if (!nameConflict) {
                                 data.items.push({
@@ -552,88 +562,88 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
         const codiconsUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
 
         return `<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link href="${styleUri}" rel="stylesheet">
-                <link href="${codiconsUri}" rel="stylesheet">
-                <title>Command Tracker</title>
-            </head>
-            <body>
-                <div id="app">
-                    <div class="tabs">
-                        <button class="tab-btn active" data-tab="commands">Commands</button>
-                        <button class="tab-btn" data-tab="prompts">Prompts</button>
-                        <button class="tab-btn" data-tab="pinned">Pinned</button>
-                    </div>
-                    
-                    <div class="search-container">
-                        <input type="text" id="search" placeholder="Search..." />
-                        <button id="collapse-all-btn" class="icon-action-btn" title="Collapse All"><span class="codicon codicon-collapse-all"></span></button>
-                        <button id="expand-all-btn" class="icon-action-btn" title="Expand All"><span class="codicon codicon-expand-all"></span></button>
-                        <button id="add-btn">+</button>
-                    </div>
-
-                    <!-- Missing Repos Container -->
-                    <div id="missing-repos-container" class="missing-repos-container hidden">
-                        <div id="missing-repos-header" class="missing-repos-header">
-                            <span class="codicon codicon-chevron-down"></span>
-                            <span>Missing Repositories</span>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <link href="${styleUri}" rel="stylesheet">
+                    <link href="${codiconsUri}" rel="stylesheet">
+                    <title>Command Tracker</title>
+                </head>
+                <body>
+                    <div id="app">
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="commands">Commands</button>
+                            <button class="tab-btn" data-tab="prompts">Prompts</button>
+                            <button class="tab-btn" data-tab="pinned">Pinned</button>
                         </div>
-                        <div id="missing-repos-list" class="missing-repos-list"></div>
+                        
+                        <div class="search-container">
+                            <input type="text" id="search" placeholder="Search..." />
+                            <button id="collapse-all-btn" class="icon-action-btn" title="Collapse All"><span class="codicon codicon-collapse-all"></span></button>
+                            <button id="expand-all-btn" class="icon-action-btn" title="Expand All"><span class="codicon codicon-expand-all"></span></button>
+                            <button id="add-btn">+</button>
+                        </div>
+
+                        <!-- Missing Repos Container -->
+                        <div id="missing-repos-container" class="missing-repos-container hidden">
+                            <div id="missing-repos-header" class="missing-repos-header">
+                                <span class="codicon codicon-chevron-down"></span>
+                                <span>Missing Repositories</span>
+                            </div>
+                            <div id="missing-repos-list" class="missing-repos-list"></div>
+                        </div>
+
+                        <div id="list-container" class="list-container">
+                            <!-- Items will be injected here -->
+                        </div>
+
+                        <div class="sync-footer">
+                            <button id="sync-btn">Sync with Git</button>
+                            <button id="pull-btn" class="hidden">Pull Updates</button>
+                        </div>
                     </div>
 
-                    <div id="list-container" class="list-container">
-                        <!-- Items will be injected here -->
-                    </div>
+                    <div id="modal" class="modal hidden">
+                        <div class="modal-content">
+                            <h3 id="modal-title">Add Entry</h3>
+                            <div class="modal-body">
+                                <input type="text" id="entry-name" placeholder="Name" />
+                                <textarea id="entry-content" placeholder="Content / Command"></textarea>
+                                <textarea id="entry-notes" placeholder="Notes (Optional)"></textarea>
+                                
+                                <div class="picker-row">
+                                    <button id="icon-picker-trigger" class="picker-btn">
+                                        <span id="current-icon-display" class="codicon codicon-symbol-folder"></span>
+                                        <span id="current-icon-name">Folder</span>
+                                    </button>
+                                    <button id="color-picker-trigger" class="picker-btn">
+                                        <div id="current-color-display" class="color-dot" style="background-color: var(--vscode-button-background);"></div>
+                                        <span id="current-color-name">Default</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                    <div class="sync-footer">
-                        <button id="sync-btn">Sync with Git</button>
-                        <button id="pull-btn" class="hidden">Pull Updates</button>
-                    </div>
-                </div>
-
-                <div id="modal" class="modal hidden">
-                    <div class="modal-content">
-                        <h3 id="modal-title">Add Entry</h3>
-                        <div class="modal-body">
-                            <input type="text" id="entry-name" placeholder="Name" />
-                            <textarea id="entry-content" placeholder="Content / Command"></textarea>
-                            <textarea id="entry-notes" placeholder="Notes (Optional)"></textarea>
-                            
-                            <div class="picker-row">
-                                <button id="icon-picker-trigger" class="picker-btn">
-                                    <span id="current-icon-display" class="codicon codicon-symbol-folder"></span>
-                                    <span id="current-icon-name">Folder</span>
-                                </button>
-                                <button id="color-picker-trigger" class="picker-btn">
-                                    <div id="current-color-display" class="color-dot" style="background-color: var(--vscode-button-background);"></div>
-                                    <span id="current-color-name">Default</span>
-                                </button>
+                            <div class="modal-actions">
+                                <button id="cancel-modal">Cancel</button>
+                                <button id="save-modal">Save</button>
                             </div>
                         </div>
-
-                        <div class="modal-actions">
-                            <button id="cancel-modal">Cancel</button>
-                            <button id="save-modal">Save</button>
-                        </div>
                     </div>
-                </div>
 
-                <!-- Dropdown Pickers -->
-                <div id="icon-picker-dropdown" class="picker-dropdown hidden">
-                    <input type="text" id="icon-search" placeholder="Search icons..." />
-                    <div id="icon-list" class="picker-list"></div>
-                </div>
+                    <!-- Dropdown Pickers -->
+                    <div id="icon-picker-dropdown" class="picker-dropdown hidden">
+                        <input type="text" id="icon-search" placeholder="Search icons..." />
+                        <div id="icon-list" class="picker-list"></div>
+                    </div>
 
-                <div id="color-picker-dropdown" class="picker-dropdown hidden">
-                    <input type="text" id="color-search" placeholder="Search colors..." />
-                    <div id="color-list" class="picker-list"></div>
-                </div>
+                    <div id="color-picker-dropdown" class="picker-dropdown hidden">
+                        <input type="text" id="color-search" placeholder="Search colors..." />
+                        <div id="color-list" class="picker-list"></div>
+                    </div>
 
-                <script src="${scriptUri}"></script>
-            </body>
-            </html>`;
+                    <script src="${scriptUri}"></script>
+                </body>
+                </html>`;
     }
 }

@@ -237,7 +237,8 @@
         selectedIcon: ICONS[0],
         selectedColor: COLORS[0],
         collapsedGroups: {},
-        isSubscribedReposOpen: false
+        isSubscribedReposOpen: false,
+        currentUser: null
     };
 
     // Load initial data
@@ -315,6 +316,7 @@
         editingId = null;
         document.getElementById('modal-title').textContent = 'Add Entry';
         clearModal();
+        setModalReadOnly(false);
         modal.classList.remove('hidden');
     });
 
@@ -378,11 +380,11 @@
         }
     });
 
-    function editEntry(id) {
+    function editEntry(id, isReadOnly = false) {
         const entry = state.entries.find(e => e.id === id);
         if (entry) {
             editingId = id;
-            document.getElementById('modal-title').textContent = 'Edit Entry';
+            document.getElementById('modal-title').textContent = isReadOnly ? 'View Detail' : 'Edit Entry';
             document.getElementById('entry-name').value = entry.name;
             document.getElementById('entry-content').value = entry.content;
             document.getElementById('entry-notes').value = entry.notes || '';
@@ -393,12 +395,14 @@
             updateIconSelection(savedIcon);
             updateColorSelection(savedColor);
 
+            setModalReadOnly(isReadOnly);
             modal.classList.remove('hidden');
         }
     }
 
     // Picker Logic
     iconTrigger.addEventListener('click', (e) => {
+        if (modal.dataset.readonly === 'true') return;
         e.stopPropagation();
         const rect = iconTrigger.getBoundingClientRect();
         iconDropdown.style.top = `${rect.bottom + 4}px`;
@@ -410,6 +414,7 @@
     });
 
     colorTrigger.addEventListener('click', (e) => {
+        if (modal.dataset.readonly === 'true') return;
         e.stopPropagation();
         const rect = colorTrigger.getBoundingClientRect();
         colorDropdown.style.top = `${rect.bottom + 4}px`;
@@ -503,6 +508,21 @@
         });
     });
 
+    function setModalReadOnly(isReadOnly) {
+        modal.dataset.readonly = isReadOnly;
+        document.getElementById('entry-name').readOnly = isReadOnly;
+        document.getElementById('entry-content').readOnly = isReadOnly;
+        document.getElementById('entry-notes').readOnly = isReadOnly;
+
+        if (isReadOnly) {
+            saveModal.classList.add('hidden');
+            cancelModal.textContent = 'Close';
+        } else {
+            saveModal.classList.remove('hidden');
+            cancelModal.textContent = 'Cancel';
+        }
+    }
+
     function clearModal() {
         document.getElementById('entry-name').value = '';
         document.getElementById('entry-content').value = '';
@@ -530,13 +550,9 @@
         const message = event.data;
         switch (message.type) {
             case 'dataLoaded':
-                if (message.value && message.value.items) {
-                    state.entries = message.value.items;
-                    state.subscriptions = message.value.subscriptions || [];
-                } else {
-                    state.entries = message.value || [];
-                    state.subscriptions = [];
-                }
+                state.entries = message.value.items || [];
+                state.subscriptions = message.value.subscriptions || [];
+                state.currentUser = message.username || null;
                 render();
                 renderSubscriptions();
                 break;
@@ -666,6 +682,9 @@
                         `<span class="entry-source-badge" title="Source: ${entry.source}">@${entry.source}</span>` :
                         '';
 
+                    // Determine if editable (local OR self-sourced)
+                    const isEditable = !entry.source || entry.source === 'local' || (state.currentUser && entry.source === state.currentUser);
+
                     el.innerHTML = `
                         <div class="entry-icon">
                             <span class="codicon codicon-${iconName}" style="color: ${iconColor}"></span>
@@ -680,9 +699,10 @@
                         </div>
                         <div class="entry-actions">
                             <button class="action-btn copy-btn" title="Copy Content"><span class="codicon codicon-copy"></span></button>
-                            ${(!entry.source || entry.source === 'local') ? `<button class="action-btn edit-btn" title="Edit Entry"><span class="codicon codicon-edit"></span></button>` : ''}
+                            <button class="action-btn view-btn" title="View Detail"><span class="codicon codicon-eye"></span></button>
+                            ${isEditable ? `<button class="action-btn edit-btn" title="Edit Entry"><span class="codicon codicon-edit"></span></button>` : ''}
                             <button class="action-btn pin-btn" title="${entry.pinned ? 'Unpin' : 'Pin'}"><span class="codicon codicon-${entry.pinned ? 'pin' : 'pinned'}"></span></button>
-                            ${(!entry.source || entry.source === 'local') ? `<button class="action-btn delete-btn" title="Delete Entry"><span class="codicon codicon-trash"></span></button>` : ''}
+                            ${isEditable ? `<button class="action-btn delete-btn" title="Delete Entry"><span class="codicon codicon-trash"></span></button>` : ''}
                         </div>
                     `;
 
@@ -701,11 +721,16 @@
                         });
                     });
 
+                    el.querySelector('.view-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        editEntry(entry.id, true);
+                    });
+
                     const editBtn = el.querySelector('.edit-btn');
                     if (editBtn) {
                         editBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            editEntry(entry.id);
+                            editEntry(entry.id, false);
                         });
                     }
 
