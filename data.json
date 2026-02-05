@@ -1,0 +1,35 @@
+{
+  "items": [
+    {
+      "id": "test-item-1",
+      "name": "Hello World",
+      "content": "echo 'Hello from SwipedSam!'",
+      "notes": "A simple test command.",
+      "type": "command",
+      "icon": "symbol-event",
+      "color": "var(--vscode-charts-blue)",
+      "pinned": false
+    },
+    {
+      "id": "test-item-2",
+      "name": "Git Status",
+      "content": "git status",
+      "notes": "Check repository status.",
+      "type": "command",
+      "icon": "git-compare",
+      "color": "var(--vscode-charts-green)",
+      "pinned": true
+    },
+    {
+      "id": "test-item-3",
+      "name": "PR Template",
+      "content": "## Description\n\nBriefly describe the changes.\n\n## Type of Change\n\n- [ ] Bug fix\n- [ ] New feature\n- [ ] Breaking change",
+      "notes": "Sample Pull Request template.",
+      "type": "prompt",
+      "icon": "git-pull-request",
+      "color": "var(--vscode-charts-orange)",
+      "pinned": false
+    }
+  ],
+  "subscriptions": []
+}

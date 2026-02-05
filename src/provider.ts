@@ -216,27 +216,35 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
 
                     // Try to pull first
                     progress.report({ message: "Pulling latest..." });
+                    let pullSuccess = false;
                     try {
                         // Attempt standard rebase pull
                         await this._execGit(['pull', 'origin', 'main', '--rebase']);
+                        pullSuccess = true;
                     } catch (pullErr: any) {
                         // If unrelated histories, attempt to reconcile
                         if (pullErr.includes('unrelated histories')) {
                             progress.report({ message: "Reconciling unrelated histories..." });
-                            await this._execGit(['pull', 'origin', 'main', '--allow-unrelated-histories', '--no-edit']);
+                            try {
+                                await this._execGit(['pull', 'origin', 'main', '--allow-unrelated-histories', '--no-edit']);
+                                pullSuccess = true;
+                            } catch (reconcileErr: any) {
+                                throw new Error(`Failed to reconcile histories: ${reconcileErr}`);
+                            }
                         } else if (pullErr.includes('CONFLICT')) {
                             throw new Error('Sync conflict detected in data.json. Please resolve it manually or reset Git config.');
                         } else {
-                            // Other pull errors (e.g. offline) - we might still be able to push if remote is just ahead
-                            console.log(`Pull failed: ${pullErr}`);
+                            // If pull failed for other reasons (e.g. network, or non-fast-forward that rebase couldn't handle automatically)
+                            throw new Error(`Pull failed: ${pullErr}. Please check your connection or resolve conflicts manually.`);
                         }
                     }
 
-                    progress.report({ message: "Pushing..." });
-                    await this._execGit(['push', '-u', 'origin', 'main']);
-
-                    vscode.window.showInformationMessage('Sync complete!');
-                    this._loadData(); // Reload in case pull changed data.json
+                    if (pullSuccess) {
+                        progress.report({ message: "Pushing..." });
+                        await this._execGit(['push', '-u', 'origin', 'main']);
+                        vscode.window.showInformationMessage('Sync complete!');
+                        this._loadData(); // Reload in case pull changed data.json
+                    }
                 } catch (err: any) {
                     vscode.window.showErrorMessage(`Sync failed: ${err}`);
                 }

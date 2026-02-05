@@ -290,8 +290,8 @@
     // Collapse/Expand All
     collapseAllBtn.addEventListener('click', () => {
         // Set all current groups to collapsed
-        const filtered = state.entries.filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab);
-        const iconNames = [...new Set(filtered.map(e => e.icon || (e.type === 'prompts' ? 'terminal' : 'symbol-folder')))];
+        const filtered = state.entries.filter(e => state.activeTab === 'pinned' ? e.pinned : (e.type === state.activeTab || e.type === state.activeTab.slice(0, -1)));
+        const iconNames = [...new Set(filtered.map(e => e.icon || ((e.type === 'prompts' || e.type === 'prompt') ? 'terminal' : 'symbol-folder')))];
         iconNames.forEach(iconName => {
             state.collapsedGroups[iconName] = true;
         });
@@ -300,8 +300,8 @@
 
     expandAllBtn.addEventListener('click', () => {
         // Set all current groups to expanded
-        const filtered = state.entries.filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab);
-        const iconNames = [...new Set(filtered.map(e => e.icon || (e.type === 'prompts' ? 'terminal' : 'symbol-folder')))];
+        const filtered = state.entries.filter(e => state.activeTab === 'pinned' ? e.pinned : (e.type === state.activeTab || e.type === state.activeTab.slice(0, -1)));
+        const iconNames = [...new Set(filtered.map(e => e.icon || ((e.type === 'prompts' || e.type === 'prompt') ? 'terminal' : 'symbol-folder')))];
         iconNames.forEach(iconName => {
             state.collapsedGroups[iconName] = false;
         });
@@ -602,7 +602,7 @@
         listContainer.innerHTML = '';
 
         const filtered = state.entries
-            .filter(e => state.activeTab === 'pinned' ? e.pinned : e.type === state.activeTab)
+            .filter(e => state.activeTab === 'pinned' ? e.pinned : (e.type === state.activeTab || e.type === state.activeTab.slice(0, -1)))
             .filter(e => {
                 const query = state.searchQuery;
                 const matchesSearch = e.name.toLowerCase().includes(query) ||
@@ -616,7 +616,7 @@
         // Group entries by icon
         const groupedByIcon = {};
         filtered.forEach(entry => {
-            const defaultIcon = entry.type === 'prompts' ? 'terminal' : 'symbol-folder';
+            const defaultIcon = (entry.type === 'prompts' || entry.type === 'prompt') ? 'terminal' : 'symbol-folder';
             const iconName = entry.icon || defaultIcon;
             if (!groupedByIcon[iconName]) {
                 groupedByIcon[iconName] = [];
