@@ -232,7 +232,14 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                                 throw new Error(`Failed to reconcile histories: ${reconcileErr}`);
                             }
                         } else if (pullErr.includes('CONFLICT')) {
-                            throw new Error('Sync conflict detected in data.json. Please resolve it manually or reset Git config.');
+                            // Try JSON-level merge to auto-resolve
+                            progress.report({ message: "Resolving conflict with JSON merge..." });
+                            const resolved = await this._resolveConflictWithJsonMerge();
+                            if (resolved) {
+                                pullSuccess = true;
+                            } else {
+                                throw new Error('Sync conflict could not be auto-resolved. Please resolve manually or reset Git config.');
+                            }
                         } else {
                             // If pull failed for other reasons (e.g. network, or non-fast-forward that rebase couldn't handle automatically)
                             throw new Error(`Pull failed: ${pullErr}. Please check your connection or resolve conflicts manually.`);
@@ -398,6 +405,9 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
 
     private async _loadData() {
         try {
+            // Pre-fetch and merge with remote to minimize future conflicts
+            await this._prefetchAndMerge();
+
             const data = this._getRawData();
             const username = await this._getGithubUsername();
             this._view?.webview.postMessage({
@@ -603,6 +613,214 @@ export class CommandTrackerProvider implements vscode.WebviewViewProvider {
                 });
             }).on('error', reject);
         });
+    }
+
+    /**
+     * JSON-level merge for data.json files.
+     * Merges items from local and remote versions:
+     * - Items with the same ID: prefer newer (by timestamp in ID or lastModified)
+     * - Different items: keep both
+     * - Subscriptions: merge by URL, avoid duplicates
+     */
+    private _mergeJsonData(localData: any, remoteData: any): any {
+        // Normalize both to object format
+        const local = Array.isArray(localData)
+            ? { items: localData, subscriptions: [] }
+            : { items: localData.items || [], subscriptions: localData.subscriptions || [] };
+
+        const remote = Array.isArray(remoteData)
+            ? { items: remoteData, subscriptions: [] }
+            : { items: remoteData.items || [], subscriptions: remoteData.subscriptions || [] };
+
+        // Merge items by ID
+        const itemMap = new Map<string, any>();
+
+        // Add all remote items first
+        for (const item of remote.items) {
+            const key = item.source
+                ? `${item.source.toLowerCase()}:${item.originalId || item.id}`
+                : `local:${item.id}`;
+            itemMap.set(key, { ...item, _fromRemote: true });
+        }
+
+        // Then add/update with local items (local wins for same ID if newer)
+        for (const item of local.items) {
+            const key = item.source
+                ? `${item.source.toLowerCase()}:${item.originalId || item.id}`
+                : `local:${item.id}`;
+
+            const existing = itemMap.get(key);
+            if (existing) {
+                // Compare timestamps - prefer newer
+                const localTime = this._extractTimestamp(item.id);
+                const remoteTime = this._extractTimestamp(existing.id);
+
+                if (localTime >= remoteTime) {
+                    // Local is newer or same, keep local but preserve pinned status from both
+                    itemMap.set(key, {
+                        ...item,
+                        pinned: item.pinned || existing.pinned
+                    });
+                } else {
+                    // Remote is newer, keep it but merge pinned status
+                    itemMap.set(key, {
+                        ...existing,
+                        pinned: item.pinned || existing.pinned,
+                        _fromRemote: undefined
+                    });
+                }
+            } else {
+                // New local item, add it
+                itemMap.set(key, item);
+            }
+        }
+
+        // Clean up and convert back to array
+        const mergedItems = Array.from(itemMap.values()).map(item => {
+            const { _fromRemote, ...cleanItem } = item;
+            return cleanItem;
+        });
+
+        // Merge subscriptions by URL (avoid duplicates)
+        const subMap = new Map<string, any>();
+        for (const sub of [...remote.subscriptions, ...local.subscriptions]) {
+            const key = sub.url.toLowerCase();
+            if (!subMap.has(key)) {
+                subMap.set(key, sub);
+            } else {
+                // Keep the one with more recent lastSynced
+                const existing = subMap.get(key);
+                if (sub.lastSynced > existing.lastSynced) {
+                    subMap.set(key, sub);
+                }
+            }
+        }
+
+        return {
+            items: mergedItems,
+            subscriptions: Array.from(subMap.values())
+        };
+    }
+
+    /**
+     * Extract timestamp from ID (IDs are typically Date.now() based)
+     */
+    private _extractTimestamp(id: string | number): number {
+        if (typeof id === 'number') return id;
+        // Try to extract numeric prefix (Date.now() format)
+        const match = String(id).match(/^(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+    }
+
+    /**
+     * Attempt to resolve a merge/rebase conflict using JSON-level merging.
+     * Returns true if successfully resolved, false otherwise.
+     */
+    private async _resolveConflictWithJsonMerge(): Promise<boolean> {
+        const storagePath = this._context.globalStorageUri.fsPath;
+        const dataPath = path.join(storagePath, 'data.json');
+
+        try {
+            // Read the conflicted file
+            const conflictedContent = fs.readFileSync(dataPath, 'utf8');
+
+            // Check if it has conflict markers
+            if (!conflictedContent.includes('<<<<<<<') &&
+                !conflictedContent.includes('=======') &&
+                !conflictedContent.includes('>>>>>>>')) {
+                return false; // No conflict markers, not a merge conflict
+            }
+
+            // Parse out the two versions from conflict markers
+            // Format: <<<<<<< HEAD\n{local}\n=======\n{remote}\n>>>>>>> {commit}
+            const headMatch = conflictedContent.match(/<<<<<<< HEAD\r?\n([\s\S]*?)\r?\n=======/);
+            const theirsMatch = conflictedContent.match(/=======\r?\n([\s\S]*?)\r?\n>>>>>>>/);
+
+            if (!headMatch || !theirsMatch) {
+                console.log('Could not parse conflict markers');
+                return false;
+            }
+
+            let localData: any;
+            let remoteData: any;
+
+            try {
+                localData = JSON.parse(headMatch[1]);
+            } catch (e) {
+                console.log('Failed to parse local JSON from conflict');
+                return false;
+            }
+
+            try {
+                remoteData = JSON.parse(theirsMatch[1]);
+            } catch (e) {
+                console.log('Failed to parse remote JSON from conflict');
+                return false;
+            }
+
+            // Merge the two versions
+            const merged = this._mergeJsonData(localData, remoteData);
+
+            // Write the merged result
+            fs.writeFileSync(dataPath, JSON.stringify(merged, null, 2));
+
+            // Mark as resolved and continue rebase
+            await this._execGit(['add', 'data.json']);
+
+            // Check if we're in a rebase
+            if (fs.existsSync(path.join(storagePath, '.git', 'rebase-merge')) ||
+                fs.existsSync(path.join(storagePath, '.git', 'rebase-apply'))) {
+                await this._execGit(['rebase', '--continue']);
+            } else if (fs.existsSync(path.join(storagePath, '.git', 'MERGE_HEAD'))) {
+                await this._execGit(['commit', '-m', '"Merge: Auto-resolved with JSON merge"']);
+            }
+
+            vscode.window.showInformationMessage('🔀 Conflict auto-resolved by merging both versions!');
+            return true;
+        } catch (err: any) {
+            console.error('JSON merge resolution failed:', err);
+            return false;
+        }
+    }
+
+    /**
+     * Pre-fetch and merge before saving to minimize conflicts
+     */
+    private async _prefetchAndMerge(): Promise<void> {
+        const storagePath = this._context.globalStorageUri.fsPath;
+
+        // Only if git is configured
+        if (!fs.existsSync(path.join(storagePath, '.git'))) {
+            return;
+        }
+
+        try {
+            // Fetch latest from remote
+            await this._execGit(['fetch', 'origin', 'main']);
+
+            // Get remote data.json content
+            const remoteContent = await this._execGit(['show', 'origin/main:data.json']).catch(() => null);
+            if (!remoteContent) return;
+
+            const localData = this._getRawData();
+            let remoteData: any;
+
+            try {
+                remoteData = JSON.parse(remoteContent);
+            } catch (e) {
+                return; // Remote has invalid JSON, skip merge
+            }
+
+            // Merge local and remote
+            const merged = this._mergeJsonData(localData, remoteData);
+
+            // Save merged data locally (without triggering another sync)
+            const dataPath = path.join(storagePath, 'data.json');
+            fs.writeFileSync(dataPath, JSON.stringify(merged, null, 2));
+        } catch (err) {
+            // Silently fail - this is just optimization
+            console.log('Pre-fetch merge skipped:', err);
+        }
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {

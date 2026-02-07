@@ -62,6 +62,18 @@ Entries will be automatically grouped by the icon you selected.
 
 **Manual Sync:** You can still click **Sync with Git** to force a manual sync if needed.
 
+**Multi-Device Support (v1.3.3+):**
+The extension now includes **smart conflict resolution** for seamless multi-device usage:
+
+- **Auto-merge on startup:** When you open VS Code on a new device, the extension automatically fetches and merges remote changes with your local data
+- **JSON-level merging:** If both devices made changes, items are merged intelligently:
+  - Items with the same ID: the newer version wins (based on timestamp)
+  - Different items: all are preserved from both devices
+  - Pinned status: preserved across both versions
+- **Conflict auto-resolution:** If a git conflict occurs during sync, the extension automatically resolves it by merging both versions — no manual intervention needed!
+
+This means you can freely switch between devices without worrying about sync conflicts.
+
 ### Community Sync (New!)
 
 1. Open the **Manage Sources** panel at the bottom of the sidebar.
